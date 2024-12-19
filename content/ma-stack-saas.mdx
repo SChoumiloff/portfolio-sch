@@ -1,0 +1,374 @@
+---
+title: "Ma Stack pour le développement d'un SaaS"
+publishedAt: "2024-12-18"
+summary: "Guide complet sur la stack technique moderne pour développer un SaaS : Next.js, TypeScript, PostgreSQL, et plus encore"
+keywords: ["stack saas", "développement saas", "next.js", "typescript", "postgresql"]
+author: "Sacha Choumiloff"
+image: "/analyzeurbiz.png"
+tags: ["SaaS", "Development", "Stack Technique", "Web"]
+---
+
+Créer un produit SaaS de bout en bout est un défi excitant, mais aussi intimidant. Au fil des projets, j’ai affiné ma stack technique pour couvrir tous les besoins essentiels : développement, déploiement, analytics, gestion des utilisateurs, et bien plus. Aujourd’hui, je partage avec vous **ma stack complète**, ainsi que les raisons derrière chaque choix.
+
+Cette stack, principalement orientée **JavaScript/TypeScript**, a été pensée pour permettre de **construire rapidement**, tout en restant **scalable**, **efficace**, et **évolutive sur le long terme**. Pour vous donner une idée, elle m’a permis de développer mon premier produit SaaS en seulement un mois. Si vous n’êtes pas familier avec ces technologies, ne vous inquiétez pas - les concepts présentés ici peuvent être adaptés à d’autres écosystèmes.
+
+---
+
+## <a id="qui-suis-je"></a>Qui suis-je ?
+
+Je suis **Sacha Choumiloff**, ingénieur logiciel et entrepreneur. Avec 4 ans d’expérience dans le développement. Mon objectif à travers ces articles est de partager des outils et techniques qui pourraient vous inspirer ou vous être utiles dans vos propres projets futurs.
+
+Dans les sections suivantes, je vais détailler chaque composant de ma stack, en expliquant pourquoi je l’ai choisi et comment il s’intègre dans mon workflow. Que vous soyez en train de construire votre premier produit ou que vous cherchiez à optimiser vos outils, j’espère que cet article pourra vous apporter des idées utiles.
+
+---
+
+## Une approche modulaire
+
+![Turborepo Logo](https://turbo.build/images/docs/repo/repo-hero-logo-dark.svg)
+J’aime structurer mon code de manière modulaire, en découpant les fonctionnalités en plusieurs parties individuelles réutilisables. Cependant, cette approche a ses défis : il faut souvent recréer les modèles, gérer les connexions aux bases de données plusieurs fois, et s’assurer que chaque module reste cohérent. 
+
+Pour résoudre ces problèmes et gagner en efficacité, j’utilise un outil fantastique appelé **[Turborepo](https://turbo.build/repo)**. Il permet de créer facilement des **monorepos** où les différents modules d’une application peuvent partager du code, des modèles, et des configurations de manière centralisée. Grâce à Turborepo, il devient simple de maintenir et r��utiliser des fonctionnalités dans le monde Node.js, tout en gardant une architecture propre. Les monorepos ne sont pas seulement une solution pratique, ils offrent des avantages significatifs :
+
+### **1. Réduction du couplage**
+Le découpage en modules indépendants permet de limiter le couplage entre les différentes parties de l’application. Cela signifie que chaque module peut évoluer, être corrigé ou remplacé sans affecter les autres. Cette indépendance rend le code plus flexible et plus facile à maintenir à mesure que le projet grandit.
+
+### **2. Une meilleure testabilité**
+Dans une architecture modulaire, chaque composant peut être testé isolément. Cela simplifie les tests unitaires et permet d’avoir une couverture de code plus fiable. De plus, en isolant les fonctionnalités, on réduit les effets de bord qui compliquent souvent les tests dans des projets monolithiques.
+
+### **3. Identification rapide des erreurs**
+Avec une structure découpée et indépendante, il est plus facile de localiser et corriger les erreurs. Si un bug survient, on peut rapidement remonter à la source en se concentrant sur un module précis, sans avoir à naviguer dans un code monolithique confus.
+
+### **4. Partage de ressources**
+Turborepo permet de centraliser les modèles, configurations, et autres ressources critiques, les rendant accessibles à l’ensemble des modules. Cela évite la duplication de code et accélère le développement de nouvelles fonctionnalités.
+
+### **Un avantage clé : le remote caching**
+
+L’un des atouts majeurs de **Turborepo** est son **remote caching**. Cette fonctionnalité permet de mettre en cache les résultats des builds et des tests, que ce soit localement ou sur un serveur distant. En pratique, cela signifie que si une tâche a déjà été exécutée (par exemple, compiler un module), elle n’a pas besoin d’être refaite tant que le code source n’a pas changé.
+
+Ce mécanisme réduit considérablement le temps de compilation, surtout dans des projets de grande envergure où plusieurs développeurs collaborent. Lorsque vous partagez ce cache entre les membres de votre équipe grâce à un serveur distant, tout le monde peut profiter des résultats des builds déjà effectués.
+
+Cette fonctionnalité est un **game-changer** pour accélérer les workflows CI/CD et le développement en local. Je prévois d'explorer cette fonctionnalité en détail dans un futur article pour vous montrer comment l’intégrer efficacement dans vos projets.
+
+![Schéma d'un monorepo](/monorepo-schema.png)
+
+## Alternatives dans l’écosystème JavaScript
+
+Si Turborepo n’est pas votre tasse de thé, il existe d’autres solutions intéressantes dans l’écosystème JavaScript :
+
+- **[NX](https://nx.dev/)** : Un framework puissant pour la gestion des monorepos, souvent utilisé dans des projets Angular, mais qui s’intègre très bien avec React ou Node.js.
+- **[Lerna](https://lerna.js.org/)** : L’une des premières solutions populaires pour les monorepos, bien qu’elle soit moins active aujourd’hui.
+
+## **Base de données : Pourquoi PostgreSQL et mes choix personnels**
+
+Quand il s'agit de bases de données, je vais droit au but : **j'aime PostgreSQL**. C'est robuste, performant, et ça peut gérer à peu près n'importe quoi. Mais soyons clairs, il n'y a pas de "meilleure" base de données en soi. Le choix dépend avant tout de vos données et de vos besoins.
+
+Pour mes projets SaaS, j’ai testé pas mal de solutions, et aujourd’hui, j’utilise une combinaison de services qui me permet de bosser rapidement tout en gardant une architecture solide. Voici comment je m’y prends.
+
+---
+
+### **Deux approches principales : Docker ou Supabase**
+
+**1. Docker**  
+Quand j’ai besoin d'une base locale ou d'une solution 100% maîtrisée, **Docker** est mon meilleur allié. Installer PostgreSQL via Docker, c'est simple et gratuit (mis à part les coûts d'hébergement si vous déployez en production). Mais voilà, ça vient avec des compromis.
+
+- **Avantages :**
+  - Contrôle total : vous configurez votre base comme vous voulez.
+  - Pas de frais récurrents.
+- **Inconvénients :**
+  - Pas de sauvegardes automatiques (sauf si vous le configurez vous-même, et croyez-moi, ce n’est pas toujours fun).
+  - Maintenance manuelle : mises à jour, monitoring, etc. Ça peut vite devenir un casse-tête.
+
+Si vous êtes à l’aise avec la gestion des serveurs et que vous aimez tout contrôler, Docker est une solution parfaite. Sinon, il existe des options plus simples.
+
+---
+
+**2. Supabase**  
+Pour gagner du temps et éviter les galères de configuration, j’utilise souvent **Supabase**. Si vous ne connaissez pas encore, Supabase, c'est un peu comme Firebase, mais avec PostgreSQL en backend.
+
+- **Ce que j’adore :**
+  - La mise en place est ultra rapide : en 5 minutes, votre base est prête.
+  - Sauvegardes automatiques incluses (ça change la vie).
+  - Une interface claire qui vous permet de visualiser vos données, de gérer vos relations, et même de tester vos requêtes directement.
+  - En plus, c’est **gratuit jusqu’à 500MB** de données, ce qui est largement suffisant pour commencer.
+
+- **Les limites :**
+  - Passé la limite gratuite, le coût peut grimper assez vite, surtout si vos données explosent.
+  - Comme pour tout service managé, vous dépendez d’une plateforme tierce.
+
+👉 **Mon choix ?** Pour la plupart de mes projets, j’opte pour Supabase. C’est rapide, fiable, et franchement agréable à utiliser. Si vous cherchez une solution pour démarrer vite, c’est un excellent choix.
+### **Et si vous êtes plutôt "document database" ?**
+
+Si vous faites partie de la **team document database**, je vous conseille de jeter un œil à **MongoDB**. Ce système de base NoSQL est parfait pour gérer des données non structurées ou semi-structurées, et il est très apprécié pour sa flexibilité.
+
+Pour commencer rapidement, **MongoDB Atlas** est une excellente option. C’est la version freemium de MongoDB qui vous permet d’héberger vos données directement sur leur plateforme cloud. Vous avez accès à une interface intuitive, des outils pour visualiser vos données, et une offre gratuite suffisante pour démarrer.
+
+👉 **Lien utile :** [https://www.mongodb.com/fr-fr](https://www.mongodb.com/fr-fr)
+## **ORM : Je choisis Prisma**
+
+Passons maintenant aux ORM (**Object-Relational Mapping**), ces outils qui nous simplifient la vie en connectant notre code aux bases de données. Depuis quelques années, j’utilise **Prisma**, et honnêtement, je l’adore. Si vous ne l’avez pas encore testé, laissez-moi vous expliquer pourquoi il est devenu un incontournable dans ma stack.
+
+---
+
+### **Pourquoi Prisma est génial ?**
+
+1. **Syntaxe simple et lisible**  
+   La déclaration des modèles avec Prisma est un vrai plaisir. Tout est clair, concis, et surtout facile à lire. Pas besoin de se perdre dans des configurations complexes : en quelques lignes, vous pouvez modéliser vos données et générer vos migrations automatiquement.
+
+
+   ```prisma
+   model User {
+     id    String   @id @default(cuid())
+     email String   @unique
+     name  String?
+     posts Post[]   // Relation one-to-many avec Post
+   }
+
+   model Post {
+     id        String   @id @default(cuid())
+     title     String
+     content   String
+     userId    String   // Clé étrangère vers User
+     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+     createdAt DateTime @default(now())
+   }
+   ```
+
+2. **Un ORM 100% typé**  
+   Prisma est entièrement typé, et dieu sait à quel point c’est utile en JavaScript/TypeScript. Vous avez une autocomplétion impeccable dans votre IDE, et les erreurs liées aux types deviennent quasiment inexistantes. Croyez-moi, ça sauve un temps fou à long terme, surtout dans des projets complexes.
+
+---
+
+### **Un point à améliorer**
+
+Cela dit, tout n’est pas parfait. Par défaut, Prisma ouvre automatiquement son interface web (**Prisma Studio**) après chaque build, et je trouve cette fonctionnalité peu intéressante et franchement pas optimisée.
+
+- **Pourquoi je la désactive ?**
+  - Elle n’est utile qu’occasionnellement (par exemple, pour inspecter rapidement vos données), mais en développement quotidien, elle devient plus gênante qu’autre chose.
+  - Elle ralentit légèrement le processus de build, ce qui peut être frustrant si vous enchaînez les itérations rapides.
+
+👉 **Astuce :** Désactivez l’ouverture automatique de Prisma Studio dans votre configuration pour éviter ce désagrément. Vous pouvez toujours l’ouvrir manuellement quand vous en avez besoin.
+
+### **Quel ORM pour MongoDB ?**
+
+Si vous utilisez MongoDB, sachez que Prisma a ajouté le support de cette base documentaire. Cependant, si vous cherchez une alternative plus orientée NoSQL, je vous recommande **Mongoose**. 
+
+- **Mongoose** : C’est un ORM spécifiquement conçu pour MongoDB. Il offre :
+  - Une déclaration flexible de schémas pour structurer vos données.
+  - Une validation et des hooks intégrés.
+  - Un excellent écosystème pour gérer vos relations (embedded documents ou références).
+
+👉 Pour les utilisateurs MongoDB, Mongoose est souvent une solution naturelle et efficace.
+
+---
+
+## **Authentification : Pourquoi j’ai choisi Clerk**
+
+L’authentification est toujours un point sensible. Ce n’est pas seulement une question de sécurité, mais aussi d’expérience utilisateur. La mettre en place de manière totalement custom peut rapidement devenir compliqué et chronophage. Pour cette raison, je préfère déléguer ce travail à un service spécialisé qui le fait parfaitement et me fournit tous les éléments pour y arriver rapidement.
+
+Pour cela, j’utilise **[Clerk](https://clerk.dev)**. Voici pourquoi je l’aime particulièrement :
+
+---
+
+### **Les avantages de Clerk**
+
+1. **Composants UI prêts à l’emploi et customisables**  
+   Clerk propose des composants d’interface utilisateur déjà tout faits, qui s’intègrent facilement dans vos applications. Ils sont modernes, agréables visuellement, et entièrement personnalisables pour s’adapter à votre design.
+
+2. **Gestion des métadonnées**  
+   Avec Clerk, vous pouvez facilement ajouter et gérer des métadonnées pour vos utilisateurs, ce qui simplifie la personnalisation et l’organisation des données dans votre application.
+
+3. **Plusieurs modes d’authentification**  
+   Clerk supporte tous les modes d’authentification dont vous pourriez avoir besoin :
+   - Authentification classique (email et mot de passe).
+   - Magic link pour une expérience simplifiée.
+   - 2FA, 3FA, et même des codes dynamiques pour plus de sécurité.
+
+4. **Gestion des organisations et des droits**  
+   Clerk facilite la gestion des utilisateurs au sein d’organisations. Vous pouvez créer des rôles, assigner des permissions spécifiques, et même gérer des organisations complètes directement dans votre application.
+
+5. **Emails générés et customisables**  
+   Tous les emails (confirmation, réinitialisation de mot de passe, etc.) sont générés automatiquement par Clerk. Et si vous voulez les personnaliser, c’est possible, sans aucun effort supplémentaire.
+
+6. **Passage simple de dev à prod**  
+   Avec Clerk, passer de l’environnement de développement à celui de production se fait en un clic. Pas besoin de refaire toute votre configuration, ce qui est un vrai gain de temps.
+
+### **Le prix : un investissement qui en vaut la peine**
+Clerk propose une offre gratuite, mais elle est assez limitée en termes de fonctionnalités. Pour des besoins plus avancés, l’abonnement commence à **25€ par mois**. Cela peut sembler élevé, mais au vu du temps gagné et de la qualité des services, je trouve que c’est un investissement largement justifié.
+
+### **Alternatives : BetterAuth et Auth.js**
+
+Si vous cherchez des alternatives plus personnalisables (mais plus complexes à mettre en place), voici deux options populaires dans l’écosystème JavaScript :
+
+1. **[BetterAuth](https://betterauth.dev)**  
+   BetterAuth est une solution légère et hautement configurable pour gérer l’authentification. C’est un bon choix si vous voulez un contrôle total sur l’intégration dans vos applications.
+   - **Avantages :**
+     - Flexibilité maximale : idéal pour des projets où les besoins en authentification sont spécifiques.
+     - Pas de dépendance à un service SaaS tiers.
+   - **Inconvénients :**
+     - Plus complexe à configurer.
+     - Nécessite plus de temps pour la maintenance et les mises à jour.
+
+2. **[Auth.js](https://authjs.dev/)** (anciennement NextAuth.js)  
+   Auth.js est une bibliothèque spécialisée pour les applications Next.js, mais qui peut être utilisée dans d’autres frameworks. Elle supporte plusieurs providers (Google, GitHub, etc.) et gère les sessions facilement.
+   - **Avantages :**
+     - Intégration native avec Next.js.
+     - Support pour des dizaines de providers OAuth.
+     - Complètement open source et gratuit.
+   - **Inconvénients :**
+     - Nécessite plus de configuration qu’un service clé en main comme Clerk.
+     - Pas d’UI prête à l’emploi, contrairement à Clerk.
+
+
+## **Mails : Resend et React Email, un duo parfait**
+
+Dans un produit SaaS, la gestion des emails est essentielle, que ce soit pour les confirmations, les réinitialisations de mot de passe ou les notifications. Pour mes projets, j’ai opté pour deux outils qui me simplifient la vie tout en offrant des résultats professionnels : **[Resend](https://resend.com)** et **[React Email](https://react.email)**.
+
+
+### **Resend : Simplicité et efficacité**
+
+**Resend** est une solution pour envoyer les emails transactionnels. Ce service est facile à configurer et propose une version gratuite qui couvre largement les besoins de départ. Si vous avez déjà galéré avec la configuration de services comme Amazon SES ou des SMTP complexes, Resend est une bouffée d’air frais.
+
+- **Pourquoi j’aime Resend :**
+  - La mise en place est ultra-rapide.
+  - Les APIs sont claires, bien documentées, et simples à intégrer.
+  - La version gratuite est largement suffisante pour commencer.
+
+Si vous cherchez une solution efficace et sans prise de tête, je ne peux que vous recommander d’essayer Resend.
+
+### **React Email : Créer des emails avec React**
+
+Pour concevoir mes emails, j’utilise **[React Email](https://react.email)**, et je dois dire que c’est un vrai game-changer. Si vous êtes à l’aise avec React, vous allez adorer cette bibliothèque. Elle vous permet de créer des emails en utilisant des composants React, ce qui est bien plus intuitif que d’écrire du HTML brut.
+
+- **Les points forts de React Email :**
+  1. **Syntaxe React familière** : Vous écrivez vos emails comme des composants React classiques, ce qui rend la création bien plus rapide et agréable.
+  2. **Une app dédiée au développement** : React Email propose une app dédiée pour tester et visualiser vos emails en temps réel pendant le développement. C’est fluide, rapide, et ça évite d’avoir à envoyer un email à chaque modification pour vérifier le rendu.
+  3. **Personnalisation et modularité** : Vous pouvez créer des composants réutilisables pour vos headers, footers, ou tout autre élément commun à vos emails.
+
+
+### **Pourquoi ce duo est parfait ?**
+
+Avec **Resend** pour l’envoi et **React Email** pour la création, vous avez une stack légère, moderne, et efficace pour gérer tous vos besoins en emails. En plus, leur intégration est simple et rapide, ce qui vous permet de rester concentré sur le développement de votre produit.
+
+👉 **Liens utiles :**
+- **Resend** : [https://resend.com](https://resend.com)
+- **React Email** : [https://react.email](https://react.email)
+
+### **Alternative pour ceux qui ne font pas de React**
+
+Si vous n’utilisez pas React, vous pouvez opter pour des outils plus universels ou basés sur du **HTML classique** :
+
+- **MJML** ([https://mjml.io](https://mjml.io))  
+  MJML est une solution alternative pour créer des emails responsives sans se perdre dans du HTML compliqué. Il utilise une syntaxe simplifiée qui génère automatiquement un HTML compatible avec tous les clients mail.
+  - **Avantages** :
+    - Syntaxe facile à apprendre.
+    - Résultat responsive par défaut.
+    - Génère un code compatible avec les clients mail les plus capricieux (coucou Outlook).
+  - **Inconvénients** :
+    - Moins flexible si vous êtes habitué aux composants.
+
+👉 Si vous êtes à l’aise avec du code simple et que vous ne voulez pas dépendre d’un framework, MJML est une excellente alternative.
+
+## **Librairie de composants : ShadCNUI pour un développement rapide**
+
+Pour créer des interfaces utilisateurs fonctionnelles, il est souvent utile de s’appuyer sur une librairie de composants. Je ne vais pas m'attarder sur cette partie, car ce n'est pas celle où je serai le plus pertinent. Cependant, pour la plupart de mes applications, j’utilise **[Shadcnui](https://shadcn.dev/)**.
+
+### **Pourquoi Shadcnui est top ?**
+
+**Shadcnui** n’est pas une librairie classique, mais un **registre de composants**. Cela signifie que vous choisissez uniquement les composants qui vous intéressent, et ils sont directement intégrés dans votre codebase. Ce n’est pas juste du "plug and play" : vous obtenez le code source des composants, ce qui vous permet de les personnaliser à volonté.
+
+- **Avantages de Shadcnui :**
+  - **Personnalisation totale** : Une fois les composants intégrés, ils font partie de votre codebase, ce qui vous permet de les modifier ou de les étendre facilement.
+  - **Open source et actif** : L’ui de Shadcn est open source, et la communauté autour est incroyablement active.
+  - **Écosystème en pleine expansion** : La communauté construit constamment de nouveaux composants et extensions.
+
+### **Un bonus pour la communauté : Awesome Shadcn**
+
+Si vous voulez explorer encore plus de composants, je vous recommande de consulter le dépôt **[Awesome Shadcnui](https://github.com/birobirobiro/awesome-shadcn-ui)**. Ce GitHub regroupe de nombreux composants proposés par la communauté, et c’est une vraie mine d’or si vous voulez enrichir vos interfaces sans tout construire vous-même.
+
+### **Alternatives à Shadnui**
+
+Si vous cherchez d'autres librairies de composants, voici quelques options intéressantes :  
+- **[Mantine](https://mantine.dev/)**, **[Radix UI](https://www.radix-ui.com/)**, **[Chakra UI](https://chakra-ui.com/)**, **[Tailwind UI](https://tailwindui.com/)**, **[Headless UI](https://headlessui.dev/)**, **[Ant Design](https://ant.design/)**, **[Flowbite](https://flowbite.com/)**
+
+## **Analytics : Comprendre vos utilisateurs**
+
+Les analytics sont un élément crucial pour tout produit SaaS. Ils permettent de comprendre comment vos utilisateurs interagissent avec votre application, quelles fonctionnalités ils préfèrent, et où ils rencontrent des frictions. Pour mes projets, j’utilise principalement **[PostHog](https://posthog.com/)** et **[Vercel Analytics](https://vercel.com/analytics)**.
+
+---
+
+### **PostHog : Des insights précis sur vos utilisateurs**
+
+**PostHog** est un outil puissant pour analyser comment votre application est consommée. Ce qui le distingue, c’est sa capacité à fournir des métriques précises et à répondre à des questions spécifiques. Par exemple, je peux suivre un parcours utilisateur pour savoir combien de personnes cliquent sur le CTA de ma landing page, s’inscrivent sur la plateforme, mais ne s’abonnent pas.
+
+- **Avantages :**
+  - Analyse détaillée des comportements utilisateurs.
+  - Possibilité de suivre des événements personnalisés pour répondre à des besoins spécifiques.
+  - Open source, avec une version hébergée disponible.
+
+### **Vercel Analytics : Une vue d’ensemble généralisée**
+
+**Vercel Analytics** se concentre sur des métriques plus globales. Contrairement à PostHog, il n’est pas conçu pour suivre des parcours précis, mais pour vous fournir des données comme :
+- Le **nombre de visites** sur vos pages.
+- Les **temps de chargement** des pages (Web Vitals).
+- La **répartition géographique** des utilisateurs.
+
+C’est un excellent outil pour avoir une vue d’ensemble des performances de votre site et de son utilisation.  
+**Note** : Vercel Analytics est uniquement disponible pour les projets déployés sur Vercel (cf. section sur l’hébergement).
+
+### **Alternatives à Vercel Analytics : Plausible et Data Fast**
+
+Si vous cherchez d'autres options, voici deux alternatives intéressantes :
+- **[Plausible](https://plausible.io/)** : Une solution légère et respectueuse de la vie privée, parfaite pour des projets où la simplicité prime.
+- **[Data Fast](https://datafa.st/)** : Une autre option simple et rapide pour collecter des métriques essentielles.
+
+Les analytics sont indispensables pour orienter vos décisions et améliorer votre produit. Que ce soit avec PostHog pour des analyses détaillées ou Vercel Analytics pour une vue générale.
+
+## **Observabilité : Supervisez votre application avec Sentry**
+
+L’observabilité (ou supervision) est essentielle pour détecter et comprendre les erreurs qui peuvent survenir dans une application. Pour mes projets, j’utilise **[Sentry](https://sentry.io/)**, un outil puissant et simple à mettre en place qui rend la gestion des erreurs beaucoup plus rapide et efficace.
+
+### **Pourquoi j’utilise Sentry ?**
+
+Sentry est conçu pour capturer, organiser, et analyser les erreurs dans vos applications. En quelques lignes de configuration, vous pouvez suivre les exceptions, les plantages et même les performances globales de votre app. Voici pourquoi c’est un de mes outils indispensables :
+
+- **Une gestion des erreurs efficace** : Dès qu’une erreur survient, Sentry la capture, l’enregistre, et fournit des détails précis comme le stack trace, l’environnement, et les utilisateurs affectés. Cela vous permet de comprendre rapidement ce qui ne va pas.
+- **Version gratuite très généreuse** : La version gratuite est idéale pour les projets de petite à moyenne envergure, ce qui en fait un choix parfait pour les petits budgets.
+- **Nouveauté : les replay sessions** : Récemment, Sentry a ajouté les **replay sessions**. Cette option permet de rejouer les actions d’un utilisateur avant qu’un bug ne survienne, ce qui facilite énormément le diagnostic des problèmes complexes.
+
+### **Déploiement : Rapide et collaboratif avec Vercel**
+
+Pour le déploiement de mes projets, j’utilise **[Vercel](https://vercel.com/)**. C’est un outil qui rend le déploiement simple, rapide, et incroyablement efficace. En quelques secondes, vous pouvez mettre en place un workflow **CI/CD** (intégration et déploiement continus) qui fonctionne parfaitement.
+
+Avant, j’étais fan du déploiement sur un **VPS**, mais cela demande beaucoup plus de configuration, ce qui représente du temps perdu pour le développement des fonctionnalités du projet. Sans parler de la gestion et de la maintenance. Avec Vercel, vous pouvez vous affranchir de tout cela, surtout pour les projets de l’écosystème JavaScript/TypeScript.
+
+### **Pourquoi Vercel est génial ?**
+
+1. **Compatibilité avec Turborepo**  
+   Si vous utilisez un monorepo avec Turborepo (comme moi), Vercel s’intègre parfaitement. Il gère automatiquement les builds et optimise les déploiements pour que tout reste fluide.
+
+2. **Gestion intégrée des branches de déploiement**  
+   Vercel permet de gérer facilement les différentes branches de déploiement, comme **production**, **pré-production**, et **développement**. Le tout est totalement intégré avec GitHub grâce à son système de branches. À chaque pull request, une prévisualisation est automatiquement générée, ce qui simplifie énormément les tests et la collaboration.
+
+3. **Outils collaboratifs puissants**  
+   Vercel propose des outils pour simplifier la collaboration autour d’un projet. L’un de mes favoris est la fonctionnalité qui permet de déposer des commentaires directement sur une interface déployée. Cela permet aux équipes de donner des retours visuels en contexte, ce qui accélère la communication et l’amélioration des projets.
+
+   ![Vercel Commenting Feature](/vercel-comments.png)
+
+4. **Un écosystème riche**  
+   En plus du déploiement, Vercel propose des outils comme **Vercel Analytics** (pour suivre les performances et l’utilisation) et des intégrations avec des services populaires comme GitHub, Slack, et bien d’autres.
+
+### **Gratuit ou payant ?**
+
+- **Version gratuite** : Parfaite pour démarrer. Elle inclut des déploiements illimités pour des projets personnels ou de petite envergure, avec quelques limitations sur les performances et la collaboration.
+- **Version payante** : Si vous gérez des projets professionnels ou de grande envergure, l’offre payante de Vercel apporte :
+  - Des builds prioritaires pour accélérer les déploiements.
+  - Un support avancé pour les équipes.
+  - Plus de capacités (bandwidth, requêtes serveur, etc.).
+
+---
+
+Créer un produit SaaS, c’est une aventure à la fois passionnante et complexe. Tout au long de cet article, j’ai partagé avec vous la stack que j’utilise pour construire rapidement des produits performants, scalables et maintenables. Mon objectif n’est pas de dire que cette stack est la meilleure, mais qu’elle fonctionne pour moi et pourrait peut-être vous inspirer pour vos propres projets.
+
+Ce qui compte, c’est d’expérimenter, d’apprendre, et d’adapter les outils à vos besoins. Rappelez-vous que le plus important reste toujours le produit que vous construisez et l’expérience que vous offrez à vos utilisateurs.
+
+Si cet article vous a aidé, ou si vous avez des outils à me conseiller, n’hésitez pas à m’écrire ou à partager vos idées. On apprend toujours mieux ensemble. Merci d’avoir lu jusqu’ici, et bon courage pour vos prochaines créations SaaS ! 🚀
