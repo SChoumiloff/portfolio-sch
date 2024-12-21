@@ -1,16 +1,17 @@
 ---
 title: "Ma Stack pour le développement d'un SaaS"
-publishedAt: "2024-12-18"
+publishedAt: "2024-12-21"
 summary: "Guide complet sur la stack technique moderne pour développer un SaaS : Next.js, TypeScript, PostgreSQL, et plus encore"
 keywords: ["stack saas", "développement saas", "next.js", "typescript", "postgresql"]
 author: "Sacha Choumiloff"
 image: "/analyzeurbiz.png"
 tags: ["SaaS", "Development", "Stack Technique", "Web"]
+readingTime: "15 min"
 ---
 
-Créer un produit SaaS de bout en bout est un défi excitant, mais aussi intimidant. Au fil des projets, j’ai affiné ma stack technique pour couvrir tous les besoins essentiels : développement, déploiement, analytics, gestion des utilisateurs, et bien plus. Aujourd’hui, je partage avec vous **ma stack complète**, ainsi que les raisons derrière chaque choix.
+Créer un produit SaaS de bout en bout est un défi autant excitant qu'intimidant. Au fil des projets, j’ai affiné ma stack technique pour couvrir tous les besoins essentiels: développement, déploiement, analytics, gestion des utilisateurs, et bien plus. Aujourd’hui, je partage avec vous **ma stack complète**, ainsi que les raisons derrière chaque choix.
 
-Cette stack, principalement orientée **JavaScript/TypeScript**, a été pensée pour permettre de **construire rapidement**, tout en restant **scalable**, **efficace**, et **évolutive sur le long terme**. Pour vous donner une idée, elle m’a permis de développer mon premier produit SaaS en seulement un mois. Si vous n’êtes pas familier avec ces technologies, ne vous inquiétez pas - les concepts présentés ici peuvent être adaptés à d’autres écosystèmes.
+Cette stack, principalement orientée **JavaScript/TypeScript**, a été pensée pour permettre de **construire rapidement**, tout en restant **scalable**, **maintenable**, et **évolutive sur le long terme**. Pour vous donner une idée, elle m’a permis de développer mon premier produit SaaS en seulement un mois et demi.
 
 ---
 
@@ -25,9 +26,9 @@ Dans les sections suivantes, je vais détailler chaque composant de ma stack, en
 ## Une approche modulaire
 
 ![Turborepo Logo](https://turbo.build/images/docs/repo/repo-hero-logo-dark.svg)
-J’aime structurer mon code de manière modulaire, en découpant les fonctionnalités en plusieurs parties individuelles réutilisables. Cependant, cette approche a ses défis : il faut souvent recréer les modèles, gérer les connexions aux bases de données plusieurs fois, et s’assurer que chaque module reste cohérent. 
+J’aime structurer mon code de manière modulaire, en découpant les fonctionnalités en plusieurs parties individuelles réutilisables. Cependant, cette approche a certaines contraintes: il faut souvent recréer les modèles, gérer les connexions aux bases de données plusieurs fois, et s’assurer que les modules restent cohérents les uns entre les autres. 
 
-Pour résoudre ces problèmes et gagner en efficacité, j’utilise un outil fantastique appelé **[Turborepo](https://turbo.build/repo)**. Il permet de créer facilement des **monorepos** où les différents modules d’une application peuvent partager du code, des modèles, et des configurations de manière centralisée. Grâce à Turborepo, il devient simple de maintenir et r��utiliser des fonctionnalités dans le monde Node.js, tout en gardant une architecture propre. Les monorepos ne sont pas seulement une solution pratique, ils offrent des avantages significatifs :
+Pour résoudre ces problèmes et gagner en efficacité, j’utilise un outil fantastique appelé **[Turborepo](https://turbo.build/repo)**. Il permet de créer facilement des **monorepos** où les différents modules d’une application peuvent partager du code, des modèles, et des configurations de manière centralisée. Grâce à Turborepo, il devient simple de maintenir et réutiliser des fonctionnalités dans le monde Node.js, tout en gardant une architecture propre. Les monorepos ne sont pas seulement une solution pratique, ils offrent de nombreux avantages:
 
 ### **1. Réduction du couplage**
 Le découpage en modules indépendants permet de limiter le couplage entre les différentes parties de l’application. Cela signifie que chaque module peut évoluer, être corrigé ou remplacé sans affecter les autres. Cette indépendance rend le code plus flexible et plus facile à maintenir à mesure que le projet grandit.
@@ -47,7 +48,7 @@ L’un des atouts majeurs de **Turborepo** est son **remote caching**. Cette fon
 
 Ce mécanisme réduit considérablement le temps de compilation, surtout dans des projets de grande envergure où plusieurs développeurs collaborent. Lorsque vous partagez ce cache entre les membres de votre équipe grâce à un serveur distant, tout le monde peut profiter des résultats des builds déjà effectués.
 
-Cette fonctionnalité est un **game-changer** pour accélérer les workflows CI/CD et le développement en local. Je prévois d'explorer cette fonctionnalité en détail dans un futur article pour vous montrer comment l’intégrer efficacement dans vos projets.
+Cette fonctionnalité est un **game-changer** pour accélérer les workflows CI/CD et le développement en local. Je prévois de parler de cette fonctionnalité en détail dans un futur article pour vous montrer comment l’intégrer efficacement dans vos projets et workflows.
 
 ![Schéma d'un monorepo](/monorepo-schema.png)
 
@@ -58,15 +59,17 @@ Si Turborepo n’est pas votre tasse de thé, il existe d’autres solutions int
 - **[NX](https://nx.dev/)** : Un framework puissant pour la gestion des monorepos, souvent utilisé dans des projets Angular, mais qui s’intègre très bien avec React ou Node.js.
 - **[Lerna](https://lerna.js.org/)** : L’une des premières solutions populaires pour les monorepos, bien qu’elle soit moins active aujourd’hui.
 
-## **Base de données : Pourquoi PostgreSQL et mes choix personnels**
+## **Base de données : Le choix d'une base relationnelle**
 
-Quand il s'agit de bases de données, je vais droit au but : **j'aime PostgreSQL**. C'est robuste, performant, et ça peut gérer à peu près n'importe quoi. Mais soyons clairs, il n'y a pas de "meilleure" base de données en soi. Le choix dépend avant tout de vos données et de vos besoins.
+Pour mon SaaS, j'avais besoin d'une base de données relationnelle. Pourquoi ? Parce que mes données sont fortement structurées et interconnectées : des utilisateurs qui créent des établissements, qui contiennent des avis, qui eux-mêmes ont des analyses... Cette hiérarchie et ces relations complexes sont parfaitement adaptées à un modèle relationnel.
 
-Pour mes projets SaaS, j’ai testé pas mal de solutions, et aujourd’hui, j’utilise une combinaison de services qui me permet de bosser rapidement tout en gardant une architecture solide. Voici comment je m’y prends.
+MongoDB aurait pu être une option si je travaillais principalement avec des données non structurées ou si j'avais besoin d'une grande flexibilité dans mon schéma. Mais ici, la cohérence des données et la garantie ACID sont plus importantes que la flexibilité du schéma.
+
+Parmi les bases relationnelles, j'ai choisi **PostgreSQL**, mais MySQL aurait aussi pu faire le travail. C'est en partie un choix de cœur - j'apprécie particulièrement les fonctionnalités avancées de PostgreSQL comme ses types de données JSON natifs ou ses index GiST. Et si demain je veux ajouter des fonctionnalités géospatiales (ce qui est courant dans les SaaS modernes), PostgreSQL avec PostGIS sera nettement plus performant que MySQL.
 
 ---
 
-### **Deux approches principales : Docker ou Supabase**
+### **Deux approches principales pour l'hébergement : Docker ou Supabase**
 
 **1. Docker**  
 Quand j’ai besoin d'une base locale ou d'une solution 100% maîtrisée, **Docker** est mon meilleur allié. Installer PostgreSQL via Docker, c'est simple et gratuit (mis à part les coûts d'hébergement si vous déployez en production). Mais voilà, ça vient avec des compromis.
@@ -80,10 +83,9 @@ Quand j’ai besoin d'une base locale ou d'une solution 100% maîtrisée, **Dock
 
 Si vous êtes à l’aise avec la gestion des serveurs et que vous aimez tout contrôler, Docker est une solution parfaite. Sinon, il existe des options plus simples.
 
----
 
 **2. Supabase**  
-Pour gagner du temps et éviter les galères de configuration, j’utilise souvent **Supabase**. Si vous ne connaissez pas encore, Supabase, c'est un peu comme Firebase, mais avec PostgreSQL en backend.
+Pour gagner du temps et éviter les galères de configuration, j’utilise souvent [**Supabase**](https://supabase.com/). Si vous ne connaissez pas encore, Supabase, c'est un peu comme Firebase, mais avec PostgreSQL en backend.
 
 - **Ce que j’adore :**
   - La mise en place est ultra rapide : en 5 minutes, votre base est prête.
@@ -92,27 +94,27 @@ Pour gagner du temps et éviter les galères de configuration, j’utilise souve
   - En plus, c’est **gratuit jusqu’à 500MB** de données, ce qui est largement suffisant pour commencer.
 
 - **Les limites :**
-  - Passé la limite gratuite, le coût peut grimper assez vite, surtout si vos données explosent.
+  - Passé la limite gratuite, le coût peut grimper assez vite, surtout si vos quantité de données explosent.
   - Comme pour tout service managé, vous dépendez d’une plateforme tierce.
 
 👉 **Mon choix ?** Pour la plupart de mes projets, j’opte pour Supabase. C’est rapide, fiable, et franchement agréable à utiliser. Si vous cherchez une solution pour démarrer vite, c’est un excellent choix.
-### **Et si vous êtes plutôt "document database" ?**
 
-Si vous faites partie de la **team document database**, je vous conseille de jeter un œil à **MongoDB**. Ce système de base NoSQL est parfait pour gérer des données non structurées ou semi-structurées, et il est très apprécié pour sa flexibilité.
+### **Pour les besoins en base de données orientée document**
 
-Pour commencer rapidement, **MongoDB Atlas** est une excellente option. C’est la version freemium de MongoDB qui vous permet d’héberger vos données directement sur leur plateforme cloud. Vous avez accès à une interface intuitive, des outils pour visualiser vos données, et une offre gratuite suffisante pour démarrer.
+Si votre projet nécessite une base de données orientée document (par exemple pour gérer des données non structurées ou semi-structurées), **MongoDB** est une solution robuste à considérer. Ce système NoSQL excelle particulièrement dans la gestion de données flexibles et évolutives.
+
+Pour démarrer rapidement, **MongoDB Atlas** offre une excellente plateforme cloud. Elle propose une interface intuitive, des outils de visualisation de données, et une offre gratuite généreuse pour les premiers pas.
+
 
 👉 **Lien utile :** [https://www.mongodb.com/fr-fr](https://www.mongodb.com/fr-fr)
 ## **ORM : Je choisis Prisma**
 
 Passons maintenant aux ORM (**Object-Relational Mapping**), ces outils qui nous simplifient la vie en connectant notre code aux bases de données. Depuis quelques années, j’utilise **Prisma**, et honnêtement, je l’adore. Si vous ne l’avez pas encore testé, laissez-moi vous expliquer pourquoi il est devenu un incontournable dans ma stack.
 
----
-
 ### **Pourquoi Prisma est génial ?**
 
 1. **Syntaxe simple et lisible**  
-   La déclaration des modèles avec Prisma est un vrai plaisir. Tout est clair, concis, et surtout facile à lire. Pas besoin de se perdre dans des configurations complexes : en quelques lignes, vous pouvez modéliser vos données et générer vos migrations automatiquement.
+   La déclaration des modèles avec Prisma est un vrai plaisir. Tout est clair, concis, et surtout facile à lire. Pas besoin de se perdre dans des configurations complexes avec des tas d'annotations: en quelques lignes, vous pouvez modéliser vos données et générer vos migrations automatiquement.
 
 
    ```prisma
@@ -136,7 +138,6 @@ Passons maintenant aux ORM (**Object-Relational Mapping**), ces outils qui nous 
 2. **Un ORM 100% typé**  
    Prisma est entièrement typé, et dieu sait à quel point c’est utile en JavaScript/TypeScript. Vous avez une autocomplétion impeccable dans votre IDE, et les erreurs liées aux types deviennent quasiment inexistantes. Croyez-moi, ça sauve un temps fou à long terme, surtout dans des projets complexes.
 
----
 
 ### **Un point à améliorer**
 
@@ -145,6 +146,7 @@ Cela dit, tout n’est pas parfait. Par défaut, Prisma ouvre automatiquement so
 - **Pourquoi je la désactive ?**
   - Elle n’est utile qu’occasionnellement (par exemple, pour inspecter rapidement vos données), mais en développement quotidien, elle devient plus gênante qu’autre chose.
   - Elle ralentit légèrement le processus de build, ce qui peut être frustrant si vous enchaînez les itérations rapides.
+  - De plus, **Supabase** propose une interface de gestion des données qui est très pratique et facile à utiliser.
 
 👉 **Astuce :** Désactivez l’ouverture automatique de Prisma Studio dans votre configuration pour éviter ce désagrément. Vous pouvez toujours l’ouvrir manuellement quand vous en avez besoin.
 
@@ -152,14 +154,13 @@ Cela dit, tout n’est pas parfait. Par défaut, Prisma ouvre automatiquement so
 
 Si vous utilisez MongoDB, sachez que Prisma a ajouté le support de cette base documentaire. Cependant, si vous cherchez une alternative plus orientée NoSQL, je vous recommande **Mongoose**. 
 
-- **Mongoose** : C’est un ORM spécifiquement conçu pour MongoDB. Il offre :
+- [**Mongoose**](https://www.npmjs.com/package/mongoose) : C’est un ORM spécifiquement conçu pour MongoDB. Il offre :
   - Une déclaration flexible de schémas pour structurer vos données.
   - Une validation et des hooks intégrés.
   - Un excellent écosystème pour gérer vos relations (embedded documents ou références).
 
 👉 Pour les utilisateurs MongoDB, Mongoose est souvent une solution naturelle et efficace.
 
----
 
 ## **Authentification : Pourquoi j’ai choisi Clerk**
 
@@ -223,6 +224,7 @@ Si vous cherchez des alternatives plus personnalisables (mais plus complexes à 
 
 Dans un produit SaaS, la gestion des emails est essentielle, que ce soit pour les confirmations, les réinitialisations de mot de passe ou les notifications. Pour mes projets, j’ai opté pour deux outils qui me simplifient la vie tout en offrant des résultats professionnels : **[Resend](https://resend.com)** et **[React Email](https://react.email)**.
 
+---
 
 ### **Resend : Simplicité et efficacité**
 
@@ -268,15 +270,16 @@ Si vous n’utilisez pas React, vous pouvez opter pour des outils plus universel
 
 👉 Si vous êtes à l’aise avec du code simple et que vous ne voulez pas dépendre d’un framework, MJML est une excellente alternative.
 
-## **Librairie de composants : ShadCNUI pour un développement rapide**
+## **Librairie de composants : Shadcn ui pour un développement rapide**
 
 Pour créer des interfaces utilisateurs fonctionnelles, il est souvent utile de s’appuyer sur une librairie de composants. Je ne vais pas m'attarder sur cette partie, car ce n'est pas celle où je serai le plus pertinent. Cependant, pour la plupart de mes applications, j’utilise **[Shadcnui](https://shadcn.dev/)**.
 
-### **Pourquoi Shadcnui est top ?**
+---
+### **Pourquoi Shadcn ui est top ?**
 
-**Shadcnui** n’est pas une librairie classique, mais un **registre de composants**. Cela signifie que vous choisissez uniquement les composants qui vous intéressent, et ils sont directement intégrés dans votre codebase. Ce n’est pas juste du "plug and play" : vous obtenez le code source des composants, ce qui vous permet de les personnaliser à volonté.
+**Shadcn ui** n’est pas une librairie classique, mais un **registre de composants**. Cela signifie que vous choisissez uniquement les composants qui vous intéressent, et ils sont directement intégrés dans votre codebase. Ce n’est pas juste du "plug and play" : vous obtenez le code source des composants, ce qui vous permet de les personnaliser à volonté.
 
-- **Avantages de Shadcnui :**
+- **Avantages de Shadcn ui :**
   - **Personnalisation totale** : Une fois les composants intégrés, ils font partie de votre codebase, ce qui vous permet de les modifier ou de les étendre facilement.
   - **Open source et actif** : L’ui de Shadcn est open source, et la communauté autour est incroyablement active.
   - **Écosystème en pleine expansion** : La communauté construit constamment de nouveaux composants et extensions.
@@ -327,6 +330,8 @@ Les analytics sont indispensables pour orienter vos décisions et améliorer vot
 
 L’observabilité (ou supervision) est essentielle pour détecter et comprendre les erreurs qui peuvent survenir dans une application. Pour mes projets, j’utilise **[Sentry](https://sentry.io/)**, un outil puissant et simple à mettre en place qui rend la gestion des erreurs beaucoup plus rapide et efficace.
 
+---
+
 ### **Pourquoi j’utilise Sentry ?**
 
 Sentry est conçu pour capturer, organiser, et analyser les erreurs dans vos applications. En quelques lignes de configuration, vous pouvez suivre les exceptions, les plantages et même les performances globales de votre app. Voici pourquoi c’est un de mes outils indispensables :
@@ -372,3 +377,9 @@ Créer un produit SaaS, c’est une aventure à la fois passionnante et complexe
 Ce qui compte, c’est d’expérimenter, d’apprendre, et d’adapter les outils à vos besoins. Rappelez-vous que le plus important reste toujours le produit que vous construisez et l’expérience que vous offrez à vos utilisateurs.
 
 Si cet article vous a aidé, ou si vous avez des outils à me conseiller, n’hésitez pas à m’écrire ou à partager vos idées. On apprend toujours mieux ensemble. Merci d’avoir lu jusqu’ici, et bon courage pour vos prochaines créations SaaS ! 🚀
+
+### **Pour les besoins en base de données orientée document**
+
+Si votre projet nécessite une base de données orientée document (par exemple pour gérer des données non structurées ou semi-structurées), **MongoDB** est une solution robuste à considérer. Ce système NoSQL excelle particulièrement dans la gestion de données flexibles et évolutives.
+
+Pour démarrer rapidement, **MongoDB Atlas** offre une excellente plateforme cloud. Elle propose une interface intuitive, des outils de visualisation de données, et une offre gratuite généreuse pour les premiers pas. C'est une option particulièrement adaptée si vous avez besoin de schémas flexibles ou si vos données ont une structure qui évolue fréquemment.

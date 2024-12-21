@@ -17,7 +17,6 @@ export const DATA = {
     "Next.js",
     "Vercel",
     "TurboRepo",
-    "NextJs",
     "Typescript",
     "Java",
     "Postgres",

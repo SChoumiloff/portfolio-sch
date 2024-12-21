@@ -3,6 +3,7 @@ import { getBlogPosts } from "@/data/blog";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { calculateReadingTime } from "@/lib/utils";
 
 export const metadata = {
   title: "Blog Tech & SaaS | Sacha Choumiloff",
@@ -38,9 +39,21 @@ export default async function BlogPage() {
               <div className="w-full flex flex-row items-start justify-between">
                 <div className="flex flex-col">
                   <p className="tracking-tight">{post.metadata.title}</p>
-                  <p className="h-6 text-xs text-muted-foreground">
-                    {formatDate(post.metadata.publishedAt)}
-                  </p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{formatDate(post.metadata.publishedAt)}</span>
+                    <span>•</span>
+                    <span>{calculateReadingTime(post.source)}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {post.metadata.keywords?.map((tag: string, index: number) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 text-xs rounded-full bg-accent/30 text-muted-foreground"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <Image
                   src={post.metadata.image}

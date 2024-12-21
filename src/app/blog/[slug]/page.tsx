@@ -1,6 +1,6 @@
 import { getBlogPosts, getPost } from "@/data/blog";
 import { DATA } from "@/data/resume";
-import { formatDate } from "@/lib/utils";
+import { formatDate, calculateReadingTime } from "@/lib/utils";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -66,13 +66,15 @@ export default async function Blog({
     notFound();
   }
 
+  const readingTime = calculateReadingTime(post.source);
+
   return (
     <section id="blog">
       <Link 
         href="/blog"
         className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 mb-8 block"
       >
-        ← Back to Blog
+        ← Retour à la liste des articles
       </Link>
       
       <script
@@ -101,11 +103,13 @@ export default async function Blog({
         {post.metadata.title}
       </h1>
       <div className="flex justify-between items-center mt-2 mb-8 text-sm max-w-[650px]">
-        <Suspense fallback={<p className="h-5" />}>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            {formatDate(post.metadata.publishedAt)}
-          </p>
-        </Suspense>
+        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+          <Suspense fallback={<p className="h-5" />}>
+            <span>{formatDate(post.metadata.publishedAt)}</span>
+            <span>•</span>
+            <span>{readingTime}</span>
+          </Suspense>
+        </div>
       </div>
       <article
         className="prose dark:prose-invert"

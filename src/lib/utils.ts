@@ -35,3 +35,15 @@ export function formatDate(date: string) {
     return `${fullDate} (il y a ${yearsAgo}a)`;
   }
 }
+
+/**
+ * Calculate the reading time of a blog post
+ * @param content - The content of the blog post
+ * @returns The reading time of the blog post
+ */
+export function calculateReadingTime(content: string): string {
+  const wordsPerMinute = 200;
+  const words = content.trim().split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return `${minutes} min`;
+}
