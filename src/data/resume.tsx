@@ -13,13 +13,14 @@ export const DATA = {
   avatarUrl: "/me.png",
   skills: [
     "Python",
+    "FastAPI",
+    "Airflow",
+    "Typescript",
     "React",
     "Next.js",
-    "Vercel",
     "TurboRepo",
-    "Typescript",
     "Java",
-    "Postgres",
+    "Spring Boot",
     "Docker",
     "Kubernetes",
   ],
@@ -65,7 +66,7 @@ export const DATA = {
       start: "Septembre 2024",
       end: "Actuel",
       description:
-        "Analyzeurbiz est un SaaS qui permet aux gestionnaires d'établissement d'avoir une plateforme qui aggrège l'ensemble des avis clients en fournissant des alertes et des recommandations pour amélirorer leurs services.",
+        "Analyzeurbiz est un SaaS qui permet aux gestionnaires d'établissement d'avoir une plateforme qui aggrège l'ensemble des avis clients en fournissant des alertes et des recommandations pour améliorer leurs services.",
     },
     {
       company: "La Forge",
@@ -150,10 +151,10 @@ export const DATA = {
       description:
         "Mieux est une plateforme de santé qui permet à des bénéficiaires de réaliser un bilan de santé augmenté. ",
       technologies: [
-        "NestJs",
-        "Typescript",
         "Java",
         "Spring Boot",
+        "Typescript",
+        "NestJs",
         "PostgreSQL",
         "Docker",
       ],
@@ -176,6 +177,7 @@ export const DATA = {
         "Développement d'une solution algorithmique complexe ayant pour but de détecter les sources d'eaux souterraines à partir d'image satellites de la NASA.",
       technologies: [
         "Python",
+        "Airflow",
         "Pytorch",
         "Faiss",
         "Streamlit"
@@ -201,6 +203,7 @@ export const DATA = {
         "Next.js",
         "Typescript",
         "Python",
+        "FastAPI",
         "Postgresql"
       ],
       links: [

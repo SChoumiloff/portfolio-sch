@@ -17,7 +17,7 @@ Cette stack, principalement orientée **JavaScript/TypeScript**, a été pensée
 
 ## <a id="qui-suis-je"></a>Qui suis-je ?
 
-Je suis **Sacha Choumiloff**, ingénieur logiciel et entrepreneur. Avec 4 ans d’expérience dans le développement. Mon objectif à travers ces articles est de partager des outils et techniques qui pourraient vous inspirer ou vous être utiles dans vos propres projets futurs.
+Je suis **Sacha Choumiloff**, ingénieur logiciel et entrepreneur. Mon objectif à travers ces articles est de partager des outils et techniques qui pourraient vous inspirer ou vous être utiles dans vos propres projets futurs.
 
 Dans les sections suivantes, je vais détailler chaque composant de ma stack, en expliquant pourquoi je l’ai choisi et comment il s’intègre dans mon workflow. Que vous soyez en train de construire votre premier produit ou que vous cherchiez à optimiser vos outils, j’espère que cet article pourra vous apporter des idées utiles.
 
@@ -28,7 +28,7 @@ Dans les sections suivantes, je vais détailler chaque composant de ma stack, en
 ![Turborepo Logo](https://turbo.build/images/docs/repo/repo-hero-logo-dark.svg)
 J’aime structurer mon code de manière modulaire, en découpant les fonctionnalités en plusieurs parties individuelles réutilisables. Cependant, cette approche a certaines contraintes: il faut souvent recréer les modèles, gérer les connexions aux bases de données plusieurs fois, et s’assurer que les modules restent cohérents les uns entre les autres. 
 
-Pour résoudre ces problèmes et gagner en efficacité, j’utilise un outil fantastique appelé **[Turborepo](https://turbo.build/repo)**. Il permet de créer facilement des **monorepos** où les différents modules d’une application peuvent partager du code, des modèles, et des configurations de manière centralisée. Grâce à Turborepo, il devient simple de maintenir et réutiliser des fonctionnalités dans le monde Node.js, tout en gardant une architecture propre. Les monorepos ne sont pas seulement une solution pratique, ils offrent de nombreux avantages:
+Pour résoudre ces problèmes et gagner en efficacité, j’utilise un outil appelé **[Turborepo](https://turbo.build/repo)**. Il permet de créer facilement des **monorepos** où les différents modules d’une application peuvent partager du code, des modèles, et des configurations de manière centralisée. Grâce à Turborepo, il devient simple de maintenir et réutiliser des fonctionnalités dans le monde Node.js, tout en gardant une architecture propre. Les monorepos ne sont pas seulement une solution pratique, ils offrent de nombreux avantages:
 
 ### **1. Réduction du couplage**
 Le découpage en modules indépendants permet de limiter le couplage entre les différentes parties de l’application. Cela signifie que chaque module peut évoluer, être corrigé ou remplacé sans affecter les autres. Cette indépendance rend le code plus flexible et plus facile à maintenir à mesure que le projet grandit.
@@ -283,10 +283,11 @@ Pour créer des interfaces utilisateurs fonctionnelles, il est souvent utile de 
   - **Personnalisation totale** : Une fois les composants intégrés, ils font partie de votre codebase, ce qui vous permet de les modifier ou de les étendre facilement.
   - **Open source et actif** : L’ui de Shadcn est open source, et la communauté autour est incroyablement active.
   - **Écosystème en pleine expansion** : La communauté construit constamment de nouveaux composants et extensions.
+  - **Intégration avec Turborepo** : L'intégration récente avec Turborepo simplifie considérablement l'utilisation des composants dans un monorepo. Le CLI comprend maintenant la structure du projet et gère automatiquement l'installation des composants et leurs dépendances aux bons endroits. [En savoir plus sur l'intégration monorepo](https://ui.shadcn.com/docs/monorepo).
 
 ### **Un bonus pour la communauté : Awesome Shadcn**
 
-Si vous voulez explorer encore plus de composants, je vous recommande de consulter le dépôt **[Awesome Shadcnui](https://github.com/birobirobiro/awesome-shadcn-ui)**. Ce GitHub regroupe de nombreux composants proposés par la communauté, et c’est une vraie mine d’or si vous voulez enrichir vos interfaces sans tout construire vous-même.
+Si vous voulez explorer encore plus de composants, je vous recommande de consulter le dépôt **[Awesome Shadcnui](https://github.com/birobirobiro/awesome-shadcn-ui)**. Ce GitHub regroupe de nombreux composants et outils proposés par la communauté, et c’est une vraie mine d’or si vous voulez enrichir vos interfaces sans tout construire vous-même.
 
 ### **Alternatives à Shadnui**
 
@@ -336,7 +337,7 @@ L’observabilité (ou supervision) est essentielle pour détecter et comprendre
 
 Sentry est conçu pour capturer, organiser, et analyser les erreurs dans vos applications. En quelques lignes de configuration, vous pouvez suivre les exceptions, les plantages et même les performances globales de votre app. Voici pourquoi c’est un de mes outils indispensables :
 
-- **Une gestion des erreurs efficace** : Dès qu’une erreur survient, Sentry la capture, l’enregistre, et fournit des détails précis comme le stack trace, l’environnement, et les utilisateurs affectés. Cela vous permet de comprendre rapidement ce qui ne va pas.
+- **Une gestion des erreurs efficace** : Dès qu’une erreur survient, Sentry la capture, l���enregistre, et fournit des détails précis comme le stack trace, l’environnement, et les utilisateurs affectés. Cela vous permet de comprendre rapidement ce qui ne va pas.
 - **Version gratuite très généreuse** : La version gratuite est idéale pour les projets de petite à moyenne envergure, ce qui en fait un choix parfait pour les petits budgets.
 - **Nouveauté : les replay sessions** : Récemment, Sentry a ajouté les **replay sessions**. Cette option permet de rejouer les actions d’un utilisateur avant qu’un bug ne survienne, ce qui facilite énormément le diagnostic des problèmes complexes.
 
@@ -377,9 +378,3 @@ Créer un produit SaaS, c’est une aventure à la fois passionnante et complexe
 Ce qui compte, c’est d’expérimenter, d’apprendre, et d’adapter les outils à vos besoins. Rappelez-vous que le plus important reste toujours le produit que vous construisez et l’expérience que vous offrez à vos utilisateurs.
 
 Si cet article vous a aidé, ou si vous avez des outils à me conseiller, n’hésitez pas à m’écrire ou à partager vos idées. On apprend toujours mieux ensemble. Merci d’avoir lu jusqu’ici, et bon courage pour vos prochaines créations SaaS ! 🚀
-
-### **Pour les besoins en base de données orientée document**
-
-Si votre projet nécessite une base de données orientée document (par exemple pour gérer des données non structurées ou semi-structurées), **MongoDB** est une solution robuste à considérer. Ce système NoSQL excelle particulièrement dans la gestion de données flexibles et évolutives.
-
-Pour démarrer rapidement, **MongoDB Atlas** offre une excellente plateforme cloud. Elle propose une interface intuitive, des outils de visualisation de données, et une offre gratuite généreuse pour les premiers pas. C'est une option particulièrement adaptée si vous avez besoin de schémas flexibles ou si vos données ont une structure qui évolue fréquemment.
