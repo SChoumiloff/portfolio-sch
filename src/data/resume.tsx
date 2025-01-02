@@ -10,7 +10,7 @@ export const DATA = {
     "Ingénieur logiciel, entrepreneur, j'aime construire et déployer des solutions innovantes. Polyvalent, j'aime intervenir dans toutes les phases du développement de produit.",
   summary:
     "Mi-2024, j'ai quitté mon job d'ingénieur data à la forge, pour développer mon premier SaaS [Analyzeurbiz](https://analyzeurbiz.com). J'ai réalisé un [master en base de données et intelligence artificielle à l'université de Bourgogne.](/#education). Je suis également disponible pour des missions freelance à courte et moyenne durée.",
-  avatarUrl: "/me.png",
+  avatarUrl: "https://cdn.analyzeurbiz.com/me.png",
   skills: [
     "Python",
     "FastAPI",
