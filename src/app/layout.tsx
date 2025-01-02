@@ -4,14 +4,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { DATA } from "@/data/resume";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { Inter as FontSans } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Analytics } from '@vercel/analytics/next';
 
 
-const fontSans = FontSans({
+const fontSans = Roboto({
   subsets: ["latin"],
+  weight: ["100", "300", "400", "500", "700", "900"],
+  style: ['normal', 'italic'],
   variable: "--font-sans",
 });
 

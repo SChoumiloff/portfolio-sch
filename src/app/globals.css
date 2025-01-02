@@ -33,6 +33,10 @@
       --ring: 0 0% 3.9%;
 
       --radius: 0.5rem;
+
+      /* Variables pour le cahier */
+      --grid-color: rgba(0, 0, 0, 0.1);
+      --margin-color: rgba(0, 0, 0, 0.2);
     }
 
     .dark {
@@ -63,6 +67,11 @@
       --border: 0 0% 14.9%;
       --input: 0 0% 14.9%;
       --ring: 0 0% 83.1%;
+
+      /* Variables pour le cahier en mode sombre */
+      --grid-color: rgba(255, 255, 255, 0.1);
+      --margin-color: rgba(255, 255, 255, 0.2);
+      --accent-color: #374151;
     }
   }
 

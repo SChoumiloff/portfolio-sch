@@ -7,7 +7,7 @@ import { calculateReadingTime } from "@/lib/utils";
 
 export const metadata = {
   title: "Blog Tech & SaaS | Sacha Choumiloff",
-  description: "Articles techniques sur le développement SaaS, retours d'expérience et bonnes pratiques de développement web moderne.",
+  description: "Articles techniques sur le développement SaaS, retours d'expérience et bonnes pratiques de développement front et back moderne.",
   keywords: ["blog tech", "développement SaaS", "stack technique", "retour d'expérience"],
 };
 
@@ -33,7 +33,7 @@ export default async function BlogPage() {
         .map((post, id) => (
           <BlurFade delay={BLUR_FADE_DELAY * 2 + id * 0.05} key={post.slug}>
             <Link
-              className="flex flex-col space-y-1 mb-4 p-2 rounded-lg transition-all duration-200 hover:bg-accent/50 hover:scale-[1.02]"
+              className="flex flex-col space-y-1 mb-4 p-2 rounded-lg transition-all duration-200 hover:bg-primary-foreground hover:scale-[1.02]"
               href={`/blog/${post.slug}`}
             >
               <div className="w-full flex flex-row items-start justify-between">

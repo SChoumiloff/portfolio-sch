@@ -1,0 +1,34 @@
+.pageContainer {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.gridPattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background-image: 
+        linear-gradient(90deg, 
+            var(--grid-color) 1px, 
+            transparent 1px
+        ),
+        linear-gradient(0deg, 
+            var(--grid-color) 1px, 
+            transparent 1px
+        );
+    background-size: 25px 25px;
+    background-position: 0 0;
+}
+
+.contentWrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
