@@ -44,11 +44,11 @@ export default async function BlogPage() {
                     <span>•</span>
                     <span>{calculateReadingTime(post.source)}</span>
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="hidden md:flex flex-wrap gap-2 mt-2">
                     {post.metadata.keywords?.map((tag: string, index: number) => (
                       <span
                         key={index}
-                        className="px-2 py-1 text-xs rounded-full bg-accent/30 text-muted-foreground"
+                        className="px-2 py-1 text-xs rounded-full bg-accent text-accent-foreground border border-border/50"
                       >
                         {tag}
                       </span>
@@ -60,7 +60,7 @@ export default async function BlogPage() {
                   alt={post.metadata.title}
                   width={40}
                   height={40}
-                  className="rounded-full object-cover"
+                  className="hidden md:block rounded-full object-cover"
                 />
               </div>
             </Link>

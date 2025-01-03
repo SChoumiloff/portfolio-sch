@@ -21,8 +21,12 @@
             var(--grid-color) 1px, 
             transparent 1px
         );
-    background-size: 25px 25px;
+    background-size: var(--tile-size) var(--tile-size);
     background-position: 0 0;
+}
+
+.activeTile {
+    pointer-events: none;
 }
 
 .contentWrapper {
@@ -31,4 +35,16 @@
     padding: 2rem;
     position: relative;
     z-index: 1;
+}
+
+.mobileControls {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+@media (max-width: 768px) {
+    .controls {
+        transform: scale(1.2);
+    }
 }
