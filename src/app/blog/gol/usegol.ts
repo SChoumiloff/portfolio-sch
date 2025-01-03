@@ -37,7 +37,7 @@ export const useGameOfLife = (tileSize: number) => {
             }
         }
         return neighbors;
-    }, [gridDimensions]);
+    }, [gridDimensions, normalizeCoordinates]);
 
     const computeNextGeneration = useCallback(() => {
         const nextGeneration = new Set<string>();

@@ -118,7 +118,7 @@ export const GameControls = ({
                     </h3>
                     
                     <p className="text-sm text-muted-foreground">
-                        🧬 Un automate cellulaire fascinant créé par John Conway en 1970, qui simule l'évolution de cellules selon des règles simples.
+                        🧬 Un automate cellulaire fascinant créé par John Conway en 1970, qui simule l&apos;évolution de cellules selon des règles simples.
                     </p>
 
                     <div className="space-y-2">
