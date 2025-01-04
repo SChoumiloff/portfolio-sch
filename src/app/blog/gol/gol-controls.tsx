@@ -1,4 +1,4 @@
-import { PauseIcon, MixerHorizontalIcon, InfoCircledIcon } from "@radix-ui/react-icons";
+import { PauseIcon, MixerHorizontalIcon, InfoCircledIcon, LockClosedIcon, LockOpen1Icon, EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
 import styles from '../Layout.module.css';
 import { patterns, generatePattern } from './patterns';
 import React from "react";
@@ -11,6 +11,12 @@ import {
 import { Button } from "@/components/ui/button"
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { MobileControls } from "./mobile-controls";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface GameControlsProps {
     isGameRunning: boolean;
@@ -19,6 +25,8 @@ interface GameControlsProps {
     showInfo: boolean;
     setShowInfo: (value: boolean) => void;
     theme: string;
+    isVisible: boolean;
+    setIsVisible: (value: boolean) => void;
 }
 
 export const GameControls = ({
@@ -27,7 +35,9 @@ export const GameControls = ({
     setClickedTiles,
     showInfo,
     setShowInfo,
-    theme
+    theme,
+    isVisible,
+    setIsVisible
 }: GameControlsProps) => {
     const [showPatterns, setShowPatterns] = React.useState(false);
     const [isOpen, setIsOpen] = React.useState(false);
@@ -43,7 +53,7 @@ export const GameControls = ({
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     };
 
     const menuStyle = {
@@ -82,21 +92,38 @@ export const GameControls = ({
     };
 
     const controls = [
-        <div key="play" style={{ position: 'relative' }}>
-            <button 
-                onClick={() => setIsGameRunning(!isGameRunning)}
-                style={buttonStyle}
-            >
-                {isGameRunning ? <PauseIcon /> : '▶'}
-            </button>
-        </div>,
-        <button 
-            key="clear"
-            onClick={() => setClickedTiles(new Set())}
-            style={buttonStyle}
-        >
-            ✕
-        </button>,
+        <TooltipProvider key="play-tooltip">
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button 
+                        onClick={() => setIsGameRunning(!isGameRunning)}
+                        style={buttonStyle}
+                    >
+                        {isGameRunning ? <PauseIcon /> : '▶'}
+                    </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{isGameRunning ? 'Mettre en pause la simulation' : 'Lancer la simulation'}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>,
+
+        <TooltipProvider key="clear-tooltip">
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button 
+                        onClick={() => setClickedTiles(new Set())}
+                        style={buttonStyle}
+                    >
+                        ✕
+                    </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Effacer toutes les cellules</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>,
+
         <Popover key="info">
             <PopoverTrigger asChild>
                 <Button 
@@ -187,11 +214,28 @@ export const GameControls = ({
                 </div>
             </PopoverContent>
         </Popover>,
+
         <PatternSelect 
             key="patterns"
             onSelect={setClickedTiles}
             buttonStyle={buttonStyle}
-        />
+        />,
+
+        <TooltipProvider key="visibility-tooltip">
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button 
+                        onClick={() => setIsVisible(!isVisible)}
+                        style={buttonStyle}
+                    >
+                        {isVisible ? <EyeOpenIcon /> : <EyeClosedIcon />}
+                    </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{isVisible ? "Masquer la grille" : "Afficher la grille"}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>,
     ];
 
     if (isMobile) {

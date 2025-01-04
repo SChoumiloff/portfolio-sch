@@ -28,7 +28,9 @@ export async function generateMetadata({
     keywords,
   } = post.metadata;
   
-  let ogImage = image ? `${DATA.url}${image}` : `${DATA.url}/og?title=${title}`;
+  let ogImage = image 
+    ? `${DATA.url}${image}`
+    : `${DATA.url}/og?title=${title}`;
 
   return {
     title: `${title} | Blog Tech Sacha Choumiloff`,
@@ -40,7 +42,12 @@ export async function generateMetadata({
       type: "article",
       publishedTime,
       url: `${DATA.url}/blog/${post.slug}`,
-      images: [{ url: ogImage }],
+      images: [{ 
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: title,
+      }],
       authors: [DATA.name],
       tags: keywords,
     },

@@ -7,6 +7,8 @@ export const useGameOfLife = (tileSize: number) => {
     const [isSelecting, setIsSelecting] = useState(false);
     const [startTile, setStartTile] = useState<TileCoordinate | null>(null);
     const [gridDimensions, setGridDimensions] = useState({ width: 0, height: 0 });
+    const [isDisabled, setIsDisabled] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
         const updateGridSize = () => {
@@ -64,13 +66,12 @@ export const useGameOfLife = (tileSize: number) => {
                 }
             }
         });
-
         setClickedTiles(nextGeneration);
     }, [clickedTiles, getNeighbors]);
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout;
-        if (isGameRunning) {
+        if (isGameRunning && !isDisabled) {
             intervalId = setInterval(computeNextGeneration, 100);
         }
         return () => {
@@ -78,7 +79,7 @@ export const useGameOfLife = (tileSize: number) => {
                 clearInterval(intervalId);
             }
         };
-    }, [isGameRunning, computeNextGeneration]);
+    }, [isGameRunning, computeNextGeneration, isDisabled]);
 
     return {
         clickedTiles,
@@ -90,6 +91,10 @@ export const useGameOfLife = (tileSize: number) => {
         startTile,
         setStartTile,
         tileSize,
-        gridDimensions
+        gridDimensions,
+        isDisabled,
+        setIsDisabled,
+        isVisible,
+        setIsVisible
     };
 };

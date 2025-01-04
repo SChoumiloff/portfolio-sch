@@ -18,6 +18,7 @@ export default function BlogLayout({
     const TILE_SIZE = 10;
 
     const {
+        gridDimensions,
         clickedTiles,
         setClickedTiles,
         isGameRunning,
@@ -25,6 +26,10 @@ export default function BlogLayout({
         isSelecting,
         setIsSelecting,
         setStartTile,
+        isDisabled,
+        setIsDisabled,
+        isVisible,
+        setIsVisible
     } = useGameOfLife(TILE_SIZE);
 
     useEffect(() => {
@@ -72,6 +77,10 @@ export default function BlogLayout({
         });
     };
 
+    const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+        setIsSelecting(false);
+    };
+
     return (
         <div 
             className={styles.pageContainer}
@@ -84,9 +93,19 @@ export default function BlogLayout({
             } as React.CSSProperties}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
-            onMouseUp={() => setIsSelecting(false)}
+            onMouseUp={handleMouseUp}
         >
+            <GameGrid 
+                clickedTiles={clickedTiles}
+                gridDimensions={gridDimensions}
+                isDisabled={isDisabled}
+                tileSize={TILE_SIZE}
+                isVisible={isVisible}
+                resolvedTheme={resolvedTheme || 'light'}
+            />
             <GameControls 
+                isVisible={isVisible}
+                setIsVisible={setIsVisible}
                 isGameRunning={isGameRunning}
                 setIsGameRunning={setIsGameRunning}
                 setClickedTiles={setClickedTiles}
@@ -95,11 +114,6 @@ export default function BlogLayout({
                 theme={resolvedTheme || 'light'}
             />
             
-            <GameGrid 
-                clickedTiles={clickedTiles}
-                tileSize={TILE_SIZE}
-                resolvedTheme={resolvedTheme || 'light'}
-            />
 
             <div className={styles.contentWrapper} style={{ color: 'var(--content-color)' }}>
                 {children}

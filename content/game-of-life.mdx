@@ -1,0 +1,571 @@
+---
+title: "Le Jeu de la Vie : un automate cellulaire fascinant"
+publishedAt: "2025-01-03"
+summary: "Découvrez comment j'ai implémenté le Jeu de la Vie dans mon blog."
+keywords: ["Jeu de la Vie", "automate cellulaire", "Next.js", "TypeScript", "automate cellulaire"]
+author: "Sacha Choumiloff"
+image: "/game-of-life.png"
+tags: ["Jeu de la Vie", "automate cellulaire", "Next.js", "TypeScript", "automate cellulaire"]
+readingTime: "15 min"
+---
+
+## Introduction
+
+Le **Jeu de la Vie** (ou *Game of Life* en anglais) est un concept qui m'intéresse vraiment. Il illustre à merveille comment des **règles simples** peuvent, lorsqu'elles sont combinées et répétées dans le temps, produire des **comportements complexes** et parfois inattendus. C'est un très bel exemple de ce que l'on appelle un **automate cellulaire**.
+
+![Illustration du Jeu de la Vie](/game-of-life.png)
+
+Vous avez peut-être déjà entendu parler de ce jeu via la vidéo de [Science Étonnante](https://www.youtube.com/watch?v=S-W0NX97DB0), qui l'explique de manière très pédagogique. L'idée de cet article est donc de :
+
+1. **Le Jeu de la Vie : les bases**
+   - Qu'est-ce qu'un automate cellulaire ?
+   - Les règles fondamentales
+   - Les configurations célèbres
+
+2. **Mon implémentation technique**
+   - La grille en CSS pur
+   - Le stockage des cellules en coordonnées X/Y
+   - Le rendu des cellules vivantes
+   - Le calcul des générations suivantes
+
+3. **Patterns et configurations initiales**
+   - Les patterns célèbres
+   - Organisation et implémentation des patterns
+   - La notation RLE en détail
+   - Gestion des configurations
+
+4. **Faits intéressants sur le Jeu de la Vie**
+   - Turing-complet
+   - Inspiration en biologie
+   - Variantes du Jeu de la Vie
+
+Je me suis également **inspiré** du site de la fondation [**CKB Nervos Network**](https://www.nervos.org/), qui affichait un fond basé sur le Jeu de la Vie. J'ai voulu relever le défi de le recoder à ma façon, en **TypeScript**, dans une application **Next.js**. Si le projet vous intéresse, vous pouvez retrouver le **code source complet** sur mon [*GitHub*](https://github.com/SChoumiloff/portfolio-sch).
+
+## Qu’est-ce que le Jeu de la Vie ?
+
+Le Jeu de la Vie est un **automate cellulaire** créé par John Horton Conway. Un automate cellulaire peut se définir comme suit :
+
+> Tous les systèmes constitués de structures élémentaires simples qui évoluent de façon discontinue dans le temps selon des règles fixées d’avance et déterministes.
+
+Dans le cas du Jeu de la Vie, la structure élémentaire est une **cellule** (vivante ou morte), et son évolution dépend de règles très simples :
+
+- **Naissance** : une cellule morte devient vivante si elle est entourée exactement de trois cellules vivantes.
+    ![Naisance](/gol-birth.png)
+- **Survie** : une cellule vivante le reste si elle possède deux ou trois cellules voisines vivantes.
+    ![Survive](/gol-stay.png)
+- **Mort** : dans les autres cas (moins de deux ou plus de trois voisins vivants), la cellule meurt ou reste morte.
+    ![Mort](/gol-death-less.png)
+    ![Mort](/gol-death-much.png)
+
+Ces règles, assez simples en apparence, sont pourtant capables de générer des schémas dynamiques et complexes. De nombreuses **configurations célèbres** (appelées *patterns*) ont été trouvées : par exemple, le *Glider*, le *Pulsar* ou encore le *Spaceship*.
+
+## Stockage des cellules : coordonnées X/Y
+
+Pour mettre en place le Jeu de la Vie, j'utilise une grille 2D dont chaque **cellule** est identifiée par un couple de coordonnées `(x, y)`.
+
+- **`clickedTiles`** : un ensemble qui stocke toutes les cellules vivantes, identifiées par leur coordonnée en `x,y`.
+- **`gridDimensions`** : un objet contenant la `width` (largeur) et la `height` (hauteur) de la grille, exprimées en nombre de cellules (et non en pixels).
+
+<details>
+<summary>Schéma d’une grille 2D (Cliquer pour afficher)</summary>
+
+```plaintext
+        y=0    y=1    y=2    y=3
+
+x=0     (0,0)  (0,1)  (0,2)  (0,3)
+x=1     (1,0)  (1,1)  (1,2)  (1,3)
+x=2     (2,0)  (2,1)  (2,2)  (2,3)
+x=3     (3,0)  (3,1)  (3,2)  (3,3)
+```
+
+Dans ce tableau, chaque case **(x,y)** peut être **vivante** ou **morte**. Le Jeu de la Vie se base ensuite sur les règles de naissance, survie et mort pour faire évoluer la grille. Pour appliquer les trois règles essentielles il est nécessaire de connaitre les voisins de chaque cellule.
+
+## Calcul et stockage des voisins
+
+Dans le Jeu de la Vie, chaque cellule vivante ou morte a 8 voisins potentiels (haut, bas, gauche, droite, et diagonales). 
+
+![Voisins](/gol-neighbors.png)
+
+Pour obtenir la liste de ces voisins, on :
+
+1.	Parcourt les décalages possibles -1, 0, +1 en x et y.
+2.	Exclut le déplacement (0,0) (la cellule elle-même).
+3.	Normalise les coordonnées pour rester dans la grille et tenir compte du “retour” (si on dépasse les bords, on revient à l’autre extrémité).
+
+Ce concept de normalisation donne un effet “tore” à la grille : traverser la bordure haute fait réapparaître en bas, et inversement. Il est propre à mon implémentation, dans le vrai jeu de la vie, la grille est infinie.
+
+```plaintext
+   (x-1, y-1) |  (x, y-1)  | (x+1, y-1)
+   ------------------------------------
+   (x-1, y)   |  (x,y)     | (x+1, y)
+   ------------------------------------
+   (x-1, y+1) |  (x, y+1)  | (x+1, y+1)
+```
+
+Chaque voisin est stocké dans une liste 2D, dont chaque élément est un objet `[x, y]`.
+
+## Évolution du jeu : passage à la génération suivante
+
+Pour passer d’une génération à la suivante, on va :
+
+1.	Lister toutes les cellules à examiner :
+    - Celles qui sont vivantes actuellement.
+    - Leurs voisins potentiels (car une cellule morte peut éventuellement naître).
+2.	Compter le nombre de voisins vivants pour chacune de ces cellules.
+3.	Appliquer les règles :
+    - Survie : une cellule vivante reste vivante si elle a 2 ou 3 voisins vivants.
+    - Naissance : une cellule morte devient vivante si elle a 3 voisins vivants.
+    - Mort : dans les autres cas, elle reste ou devient morte.
+4.	Construire un nouvel ensemble de cellules vivantes en se basant sur ces règles.
+
+## Intégration et code source
+
+### Architecture 
+
+
+```plaintext
+.
+├── layout.tsx
+├── Layout.module.css
+└── gol
+    ├── gol-controls.tsx
+    ├── gol-grid.tsx
+    ├── useGol.ts
+    └── patterns.ts
+```
+
+### `layout.tsx`
+
+Le fichier `layout.tsx` est le composant racine de la page. Il contient le code de la grille, les boutons de contrôle et la gestion des évenements permettant de colorier la grille.
+
+#### gestion des évenements
+
+On définit l'action pour colorier la grille comme suit :
+Trois événements sont nécessaires pour gérer le coloriage de manière similaire à Paint :
+
+- `onMouseDown` : déclenche le coloriage et active la cellule sur laquelle le clic est effectué.
+    ```tsx
+        const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+            const gridPattern = e.currentTarget.querySelector(`.${styles.gridPattern}`);
+            if (!gridPattern) return;
+            
+            const rect = gridPattern.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / TILE_SIZE);
+            const y = Math.floor((e.clientY - rect.top) / TILE_SIZE);
+        
+            const tileKey = `${x},${y}`;
+            setClickedTiles((prev) => {
+                const newSet = new Set(prev);
+                newSet.add(tileKey);
+                return newSet;
+            });
+        
+            setIsSelecting(true);
+            setStartTile({ x, y });
+        };
+    ```
+    - active la selection
+    - définit la cellule de départ
+
+- `onMouseMove` : continue le coloriage et détermine les nouvelles cellules à activer.
+    ```tsx
+        const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+            if (!isSelecting) return;
+        
+            const gridPattern = e.currentTarget.querySelector(`.${styles.gridPattern}`);
+            if (!gridPattern) return;
+            
+            const rect = gridPattern.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / TILE_SIZE);
+            const y = Math.floor((e.clientY - rect.top) / TILE_SIZE);
+        
+            const tileKey = `${x},${y}`;
+            setClickedTiles((prev) => {
+                const newSet = new Set(prev);
+                newSet.add(tileKey);
+                return newSet;
+            });
+        };
+    ```
+    - Si la selection est active, on continue le coloriage et détermine les nouvelles cellules à activer.
+    - chaque cellule sont stockées dans un `Set` pour éviter les doublons.
+- `onMouseUp` : arrête le coloriage.
+    ```tsx
+        const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+            setIsSelecting(false);
+        };
+    ```
+    - arrête la selection
+
+#### Gestion de l'évolution du jeu
+
+C'est aussi dans ce fichier qu'est appelé le hook `useGol` qui gère l'évolution du jeu.
+
+```typescript
+const {
+    clickedTiles,      // Set des cellules vivantes
+    setClickedTiles,   // Fonction pour mettre à jour les cellules
+    isGameRunning,     // État du jeu (en cours ou en pause)
+    setIsGameRunning,  // Fonction pour démarrer/arrêter le jeu
+    isSelecting,       // État de la sélection en cours
+    setIsSelecting,    // Fonction pour gérer la sélection
+    startTile,         // Point de départ de la sélection
+    setStartTile,      // Fonction pour définir le point de départ
+    gridDimensions,    // Dimensions de la grille
+} = useGameOfLife(TILE_SIZE);
+```
+
+### `useGol.ts`
+
+Pour gérer toute la logique du jeu de manière réutilisable, j'ai créé un hook personnalisé `useGol`. Ce hook encapsule :
+
+- L'état du jeu (cellules vivantes, dimensions de la grille)
+- La logique de sélection
+- Le calcul des générations suivantes
+- La gestion du cycle de vie du jeu
+
+C'est dans ce fichier qu'est définie la logique de l'évolution du jeu dont nous avons parlé précédemment.
+
+#### Définition de l'interval de rafraichissement
+
+```tsx  
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout;
+        if (isGameRunning && !isDisabled) {
+            intervalId = setInterval(computeNextGeneration, 10000);
+        }
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [isGameRunning, computeNextGeneration, isDisabled]);
+```
+
+Ici on définit l'interval de rafraichissement à 10000ms (10s). Toutes les 10 secondes, la fonction `computeNextGeneration` est appelée c'est la focntion qui permet au jeu d'évoluer. 
+
+#### `computeNextGeneration`
+
+Elle permet de calculer la génération suivante en se basant sur le workflow définit précédemment.
+
+**Calcul des voisins**
+
+```tsx
+    clickedTiles.forEach(tile => {
+        cellsToCheck.add(tile);
+        const [x, y] = tile.split(',').map(Number);
+        getNeighbors(x, y).forEach(neighbor => cellsToCheck.add(neighbor));
+    });
+```
+
+**Normalisation des coordonnées**
+
+```tsx
+    const normalizeCoordinates = (x: number, y: number): [number, number] => {
+        const normalizedX = ((x % gridDimensions.width) + gridDimensions.width) % gridDimensions.width;
+        const normalizedY = ((y % gridDimensions.height) + gridDimensions.height) % gridDimensions.height;
+        return [normalizedX, normalizedY];
+    };
+```
+
+La normalisation des coordonnées permet de gérer le retour à l'autre extrémité de la grille. 
+
+**Application des règles du jeu**
+
+```tsx
+    if (clickedTiles.has(cell)) {
+        if (livingNeighbors === 2 || livingNeighbors === 3) {
+            nextGeneration.add(cell);
+        }
+    } else {
+        if (livingNeighbors === 3) {
+            nextGeneration.add(cell);
+        }
+    }
+```
+
+### `grid.tsx`
+
+Ce fichier est le composant qui affiche la grille. Il utilise les états du hook `useGol` pour afficher les cellules vivantes et les cellules mortes. La grilles est totalement faite en CSS de la manière suivante : 
+
+#### Le css
+
+```css
+    .gridPattern {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+        background-image: 
+            linear-gradient(90deg, 
+                var(--grid-color) 1px, 
+                transparent 1px
+            ),
+            linear-gradient(0deg, 
+                var(--grid-color) 1px, 
+                transparent 1px
+            );
+        background-size: var(--tile-size) var(--tile-size);
+        background-position: 0 0;
+    }
+```
+
+- **position: fixed** : permet de positionner la grille en haut à gauche de la page.  
+- **z-index: -1** : permet de placer la grille en arrière-plan.  
+- **top: 0; left: 0; right: 0; bottom: 0;** : permet de couvrir toute la page (fenêtre du device).  
+- **background-image** : permet de créer la grille en CSS (dessin de la grille en CSS).  
+
+La grille est composé de deux `linear-gradient` :
+- Un premier qui va de gauche à droite.
+- Un second qui va de haut en bas.
+
+Chaque `linear-gradient` est composé de deux parties :
+- Une couleur de fond (ici `var(--grid-color)`)
+- Une couleur de fond transparent
+
+La taille de la grille est définie par la variable `--tile-size` qui est passée en props.
+
+#### Rendu des cellules vivantes
+
+Pour afficher les cellules vivantes sur la grille, j'utilise une approche simple mais efficace. Chaque cellule vivante est représentée par un `div` positionné de manière absolue sur la grille :
+
+```tsx
+    {Array.from(clickedTiles).map((key) => {
+        const [x, y] = key.split(',').map(Number);
+        return (
+            <div
+                key={key}
+                className={styles.activeTile}
+                style={{
+                    top: y * tileSize + 1 + 'px',
+                    left: x * tileSize + 2 + 'px',
+                    width: tileSize - 3 + 'px',
+                    height: tileSize - 3 + 'px',
+                    position: 'absolute',
+                    backgroundColor: resolvedTheme === 'dark' ? '#ffffff' : '#000000',
+                }}
+            />
+        );
+    })}
+```
+
+Ce code fait plusieurs choses intéressantes :
+
+1. **Conversion des coordonnées** : Pour chaque cellule vivante stockée dans `clickedTiles`, je récupère ses coordonnées `x` et `y` à partir de la clé stockée sous forme "x,y".
+
+2. **Positionnement précis** : Je calcule la position exacte de chaque cellule en :
+   - Multipliant les coordonnées par la taille d'une cellule (`tileSize`)
+   - Ajoutant de petits décalages (+1, +2) pour centrer parfaitement la cellule dans sa case
+   - Réduisant légèrement la taille (-3) pour créer une petite marge autour de la cellule
+
+J'avoue ne pas avoir trouvé de meilleure méthode pour positionner les cellules qu'y aller à taton. Si vous avez des idées, n'hésitez pas m'en faire part.
+
+3. **Adaptation au thème** : La couleur de la cellule s'adapte automatiquement au thème choisi :
+   - Blanc (`#ffffff`) en mode sombre
+   - Noir (`#000000`) en mode clair
+
+Cette approche me permet d'avoir un rendu propre et performant, même avec un grand nombre de cellules vivantes. Le positionnement absolu évite les problèmes de flux et les petits ajustements de position et de taille donnent un aspect visuel agréable à la grille.
+
+## Patterns et configurations initiales
+
+Les **patterns** sont l'un des aspects les plus fascinants du Jeu de la Vie. Ce sont des configurations de cellules qui produisent des comportements particuliers et prévisibles. J'ai implémenté plusieurs patterns célèbres dans mon projet issu du wiki [ConwayLife.com](https://conwaylife.com/wiki/).
+
+### Les patterns célèbres
+
+Dans mon implémentation, j'ai organisé les patterns en trois catégories principales :
+
+1. **Les vaisseaux** (🚀 spaceships) : des structures qui se déplacent
+   - Le Planeur (Glider) : le plus simple des vaisseaux
+   - Le LWSS (Lightweight Spaceship) : un vaisseau plus complexe
+   - Le V232P7H3V0 : un vaisseau très sophistiqué
+
+2. **Les oscillateurs** (💫 oscillators) : des structures qui se répètent
+   - Le Clignotant (Blinker) : trois cellules qui alternent
+   - La Balise (Beacon) : un oscillateur période 2
+   - Le Papillon (Butterfly) : un oscillateur complexe
+
+3. **Les canons** (🚀 guns) : des structures qui génèrent d'autres patterns
+   - Le Canon de Gosper : le premier canon à planeurs découvert
+
+### Comment intégrer un pattern dans la grille
+
+Pour gérer ces patterns, j'ai créé une structure de données TypeScript qui les organise de manière claire :
+
+```typescript
+export interface Pattern {
+    coordinates: number[][];  // Coordonnées des cellules
+    name: string;            // Nom du pattern
+    emoji: string;           // Emoji représentatif
+    description?: string;    // Description optionnelle
+}
+
+export interface PatternCategory {
+    name: string;
+    patterns: Record<string, Pattern>;
+}
+```
+
+### Matrice vs RLE
+
+J'utilise deux approches pour stocker les patterns :
+
+1. **La notation matricielle** : pour les patterns simples
+```typescript
+// Exemple du Planeur (Glider)
+coordinates: [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
+```
+
+2. **Le format RLE** (Run Length Encoded) : pour les patterns complexes
+```typescript
+const loaferPattern = `14bobo7bobo$3b2o11bo7bo11b2o$5bo10b2o5b2o10bo$...`;
+
+// Fonction de parsing RLE
+export const parseRLE = (rle: string): number[][] => {
+    // ... code de parsing ...
+};
+```
+
+Le format RLE est particulièrement intéressant car il permet de :
+- Compresser efficacement les grands patterns
+- Faciliter le partage et l'importation de patterns
+- Réduire les erreurs de saisie
+
+### La notation RLE (Run Length Encoding)
+
+La notation **RLE** (Run Length Encoding) est une méthode de compression très utilisée dans le Jeu de la Vie. Elle permet de décrire des patterns complexes de manière concise. Voici comment elle fonctionne :
+
+#### Les règles de base
+- `o` : représente une cellule vivante
+- `b` : représente une cellule morte
+- `$` : indique un saut de ligne
+- `!` : marque la fin du pattern
+- Les nombres devant ces symboles indiquent une répétition
+
+Par exemple :
+```plaintext
+2o3b2o    = oo...oo     (o = vivante, . = morte)
+```
+
+#### Un exemple concret : le Papillon
+
+Prenons le pattern du Papillon que j'ai implémenté :
+```typescript
+const loaferPattern = `14bobo7bobo$3b2o11bo7bo11b2o$5bo10b2o5b2o10bo$...`;
+```
+
+Ce code RLE se décode ainsi :
+- `14b` : 14 cellules mortes
+- `obo` : vivante, morte, vivante
+- `7b` : 7 cellules mortes
+- `obo` : vivante, morte, vivante
+- `$` : nouvelle ligne
+
+#### Le décodeur RLE
+
+Pour transformer ce format en coordonnées utilisables, j'ai créé une fonction de parsing :
+
+```typescript
+export const parseRLE = (rle: string): number[][] => {
+    const result: number[][] = [];
+    let currentX = 0;
+    let currentY = 0;
+    
+    const pattern = rle.split('\n')
+        .filter(line => !line.startsWith('#') && !line.startsWith('x'))
+        .join('')
+        .replace('!', '');
+    
+    let count = '';
+    
+    for (let i = 0; i < pattern.length; i++) {
+        const char = pattern[i];
+        if (char >= '0' && char <= '9') {
+            count += char;
+            continue;
+        }
+        
+        const repeat = count === '' ? 1 : parseInt(count);
+        count = '';
+        switch (char) {
+            case 'b':
+                currentX += repeat;
+                break;
+            case 'o':
+                for (let j = 0; j < repeat; j++) {
+                    result.push([currentX + j, currentY]);
+                }
+                currentX += repeat;
+                break;
+            case '$':
+                currentY += repeat;
+                currentX = 0;
+                break;
+        }
+    }
+    
+    return result;
+};
+```
+
+Cette fonction :
+1. **Nettoie** le code RLE en retirant les commentaires et métadonnées
+2. **Parcourt** chaque caractère du pattern
+3. **Gère les répétitions** en interprétant les nombres
+4. **Convertit** les symboles en coordonnées (x,y)
+
+L'avantage de cette notation est qu'elle permet de stocker des patterns très complexes de manière très compacte. Par exemple, le pattern V232P7H3V0 (un vaisseau complexe) peut être stocké en quelques lignes de RLE au lieu de centaines de coordonnées.
+
+#### Utilisation pratique
+
+Une fois décodé, le pattern peut être utilisé directement dans notre grille :
+
+```typescript
+const V232P7H3V0 = {
+    name: "V232P7H3V0",
+    emoji: "🚀",
+    coordinates: parseRLE(V232P7H3V0Pattern),
+    description: "Le plus petit vaisseau connu se déplaçant à une vitesse de 3 cases toutes les 7 générations"
+};
+```
+
+Cette approche me permet de :
+- Facilement **importer** des patterns depuis d'autres sources
+- **Maintenir** une bibliothèque de patterns de manière efficace
+- **Partager** des configurations complexes sans erreur
+
+### Les configurations initiales
+
+Pour placer un pattern sur la grille, j'utilise une fonction `generatePattern` qui :
+1. Prend les coordonnées du pattern
+2. Ajoute un offset pour le positionnement
+3. Retourne un Set de cellules vivantes
+
+```typescript
+export const generatePattern = (
+    coordinates: number[][], 
+    offsetX: number = 10, 
+    offsetY: number = 10
+): Set<string> => {
+    const newTiles = new Set<string>();
+    coordinates.forEach(([x, y]) => {
+        newTiles.add(`${x + offsetX},${y + offsetY}`);
+    });
+    return newTiles;
+};
+```
+
+Cette approche me permet d'avoir une bibliothèque de patterns facilement extensible et réutilisable. Les utilisateurs peuvent ainsi expérimenter avec différentes configurations initiales et observer leurs évolutions fascinantes.
+
+## Faits intéressants sur le Jeu de la Vie
+
+- Le jeu de la vie est reconnu comme Turing-complet, ce qui signifie qu’il peut simuler n’importe quel calcul qu’une machine de Turing universelle peut effectuer. Pour les plus courageux d'entre vous, vous pouvez consulter l’article [Computing backwards with Game of Life, part 1: wires and circuits](https://arxiv.org/pdf/2308.10198) de Ville Salo et Ilkka Törmä, publié en août 2023.
+- Le Jeu de la vie illustre des concepts de la biologie, notamment l’auto-organisation et l’émergence de la complexité à partir de règles simples. Il a inspiré des recherches en vie artificielle, explorant comment des systèmes simples peuvent donner naissance à des comportements complexes. 
+- Depuis sa création, de nombreuses variantes du Jeu de la vie ont été développées, modifiant les règles ou la structure de la grille. Ces adaptations permettent d’explorer une diversité de comportements et de complexités, élargissant le champ d’étude des automates cellulaires. on peut citer [HighLife](https://conwaylife.com/wiki/OCA:HighLife), [Lenia](https://chakazul.github.io/lenia.html) et pleins d'autres. 
+
+## Conclusion 
+
+Le Jeu de la Vie est un concept fascinant qui illustre parfaitement comment des règles simples peuvent produire des comportements complexes. J'ai pu apprendre beaucoup en implémentant ce jeu dans mon blog, et j'espère que cet article vous aura également intéressé. Si vous avez des questions ou des suggestions, n'hésitez pas à me contacter.
+
+Merci pour votre lecture !
