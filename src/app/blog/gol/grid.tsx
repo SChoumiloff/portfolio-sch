@@ -1,6 +1,4 @@
-import { CSSProperties, useState } from 'react';
 import styles from '../Layout.module.css';
-import { useGameOfLife } from './usegol';
 
 interface GameGridProps {
     clickedTiles: Set<string>;

@@ -22,8 +22,6 @@ interface GameControlsProps {
     isGameRunning: boolean;
     setIsGameRunning: (value: boolean) => void;
     setClickedTiles: (value: Set<string>) => void;
-    showInfo: boolean;
-    setShowInfo: (value: boolean) => void;
     theme: string;
     isVisible: boolean;
     setIsVisible: (value: boolean) => void;
@@ -33,13 +31,10 @@ export const GameControls = ({
     isGameRunning,
     setIsGameRunning,
     setClickedTiles,
-    showInfo,
-    setShowInfo,
     theme,
     isVisible,
     setIsVisible
 }: GameControlsProps) => {
-    const [showPatterns, setShowPatterns] = React.useState(false);
     const [isOpen, setIsOpen] = React.useState(false);
     const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -56,40 +51,6 @@ export const GameControls = ({
         justifyContent: 'center',
     };
 
-    const menuStyle = {
-        position: 'absolute' as const,
-        bottom: '40px',
-        backgroundColor: theme === 'dark' ? 'white' : 'black',
-        color: theme === 'dark' ? 'black' : 'white',
-        borderRadius: '8px',
-        padding: '8px',
-        display: showPatterns ? 'flex' : 'none',
-        flexDirection: 'column' as const,
-        gap: '8px',
-        minWidth: '150px'
-    };
-
-    const infoMenuStyle = {
-        position: 'absolute' as const,
-        bottom: '40px',
-        backgroundColor: theme === 'dark' ? 'white' : 'black',
-        color: theme === 'dark' ? 'black' : 'white',
-        borderRadius: '8px',
-        padding: '12px',
-        display: showInfo ? 'block' : 'none',
-        minWidth: '200px',
-        fontSize: '14px',
-        lineHeight: '1.5'
-    };
-
-    const menuItemStyle = {
-        padding: '4px 8px',
-        cursor: 'pointer',
-        borderRadius: '4px',
-        ':hover': {
-            backgroundColor: theme === 'dark' ? '#eee' : '#333'
-        }
-    };
 
     const controls = [
         <TooltipProvider key="play-tooltip">

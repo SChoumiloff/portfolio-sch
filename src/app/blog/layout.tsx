@@ -4,14 +4,17 @@ import { useEffect, useState } from 'react';
 import { useGameOfLife } from './gol/usegol';
 import { GameGrid } from './gol/grid';
 import { GameControls } from './gol/gol-controls';
-import { InfoPanel } from './gol/gol-infos';
 import styles from './Layout.module.css';
+import { usePathname } from 'next/navigation';
 
 export default function BlogLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const pathname = usePathname();
+    const isSlugPage = pathname.split('/').length > 2;
+
     const { theme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
@@ -31,6 +34,12 @@ export default function BlogLayout({
         isVisible,
         setIsVisible
     } = useGameOfLife(TILE_SIZE);
+
+    useEffect(() => {
+        if (isSlugPage) {
+            setIsVisible(false);
+        }
+    }, [isSlugPage, setIsVisible]);
 
     useEffect(() => {
         setMounted(true);
@@ -109,8 +118,6 @@ export default function BlogLayout({
                 isGameRunning={isGameRunning}
                 setIsGameRunning={setIsGameRunning}
                 setClickedTiles={setClickedTiles}
-                showInfo={showInfo}
-                setShowInfo={setShowInfo}
                 theme={resolvedTheme || 'light'}
             />
             
