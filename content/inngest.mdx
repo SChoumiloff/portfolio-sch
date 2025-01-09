@@ -1,0 +1,591 @@
+---
+title: "Inngest, orchestrer et automatiser vos workflows"
+publishedAt: "2025-01-09"
+summary: "Inngest est une plateforme puissante conçue pour automatiser vos workflows. Elle peut transformer vos processus métier et booster la productivité de votre équipe."
+keywords: ["inngest", "orchestrer", "automatiser", "workflow", "productivité"]
+author: "Sacha Choumiloff"
+image: "/icon-logo-inngest.png"
+tags: ["Inngest","workflows asynchrones","orchestrateur","automatisation","processus métier","Node.js","Python","Airflow","Temporal","tutoriel workflows"]
+readingTime: "15 min"
+---
+
+# Inngest : orchestrer et automatiser vos workflows
+
+Il existe déjà de nombreux orchestrateurs pour automatiser et gérer efficacement les workflows, tels qu’Airflow, Temporal ou encore Perfect.  
+Pourtant, **Inngest** est un petit nouveau qui fait beaucoup parler de lui : utilisé par des acteurs majeurs comme **Soundcloud**, **TripAdvisor** ou encore **Resend**, il offre une approche moderne et minimaliste pour concevoir des workflows asynchrones.
+
+## Qui suis-je ?
+
+Je suis **Sacha Choumiloff**, ingénieur logiciel et entrepreneur. Mon objectif à travers ces articles est de vous présenter des outils et des techniques qui, je l’espère, sauront vous inspirer et vous aider à construire ou améliorer vos propres projets.
+
+Dans les sections suivantes, nous explorerons :
+
+1. **Les fonctionnalités clés** d’Inngest et comment il se différencie des autres orchestrateurs.  
+2. **Des exemples concrets**: implémentations en Python et TypeScript (Next.js), illustrant comment intégrer Inngest dans des environnements variés pour orchestrer des workflows asynchrones de manière efficace.
+3. **Ses avantages et inconvénients** pour vous aider à déterminer si c’est la bonne solution pour vos besoins.  
+
+Prêt à découvrir comment Inngest peut simplifier la conception de vos workflows asynchrones ? C’est parti !
+
+## Qu’est-ce que Inngest ?
+
+Inngest est une plateforme [**open source**](https://github.com/inngest/inngest) créee en 2021 pour les développeurs souhaitant réaliser des applications avec des workflows asynchrones de manière simple et évolutive. Elle remplace les mécanismes traditionnels comme les files d’attente, la gestion d’état ou encore la planification, en proposant des fonctions durables, simplifiant le développement d’applications fiables tout en éliminant le besoin d’une infrastructure complexe. Elle permet également de simplifier la stack technique et de combiner en un seul outil des fonctionnalités comme la gestion d'évenements, la gestion d'état, la planification de tâches, et d'autres; Réduisant ainsi le nombre d'outils à connaitre, utiliser et maintenir. 
+
+## Les fonctionnalités clés
+
+Inngest propose un ensemble de fonctionnalités puissantes qui permettent de gérer efficacement les workflows asynchrones. Voici quelques-unes des principales :
+
+![Inngest fct](/inngest-benef.png)
+
+## Comment fonctionne Inngest ? 
+
+Prenons un exemple concret pour illustrer le fonctionnement d'Inngest. Au sein de l'application Analyzeurbiz, plusieurs actions asynchrones sont déclenchées par des événements spécifiques côté client (Demande d'analyse SEO d'un établissement) ou serveur (Lancement quotidien de la mise à jour des avis). 
+1. La logique de ces actions est encapsulée dans des fonctions définies dans le code, enrichies par des décorateurs Inngest. Ces décorateurs permettent d’ajouter des fonctionnalités supplémentaires aux fonctions sans modifier leur code d’origine. Nous détaillerons leur utilisation dans la section suivante.
+2. Le client Inngest agit comme un composant intermédiaire qui organise et encapsule la logique fonctionnelle de l’application. Il définit des points d’entrée spécifiques (comme les endpoints A, B, C), chacun conçu pour répondre à un événement ou gérer une tâche précise. Ces points d’entrée permettent de recevoir, traiter et rediriger les événements ou actions nécessaires vers un point central de communication, représenté ici par l’URL https://api.analyzeurbiz.com. Cela garantit une gestion centralisée et structurée des flux d’événements, tout en veillant à l’exécution claire et ordonnée de chaque tâche ou processus.
+3. Le moteur d’Inngest prend en charge :
+    - **Orchestration des workflows** : Inngest s’assure que chaque tâche (ou fonction) est exécutée dans le bon ordre, en fonction des dépendances définies.
+    - **Durabilité** : Les workflows sont persistants, ce qui signifie qu’ils peuvent survivre à des interruptions (pannes, redémarrages, etc.).
+    - **Planification** : Le moteur gère la planification des exécutions en temps réel ou différé selon les besoins.
+    - **Reprises** : En cas d’échec, le moteur permet de relancer les workflows à partir de l’étape échouée, sans recommencer tout le processus.
+    - **Gestion des erreurs** : Le moteur gère les erreurs de manière intelligente, en permettant de relancer les workflows à partir de l’étape échouée, sans recommencer tout le processus.
+    - **Gestion des tâches CRON** : Le moteur permet de planifier et lancer les tâches CRON de manière simple et efficace.
+4. Le moteur d’Inngest communique avec l’API AnalyzeUrBiz pour :
+    - Transmettre des mises à jour ou des résultats des workflows exécutés.
+    - Recevoir de nouveaux événements ou déclencheurs.
+
+![Inngest workflow](/inngest-presentation.png)
+
+À travers ce modèle, Inngest permet à Analyzeurbiz de gérer des workflows complexes de manière simple, fiable et évolutive, tout en déléguant la gestion des états et de l’orchestration au moteur inngest. Ce serveur est similaire à la version de production.
+
+## Le serveur de développement
+
+Le serveur de développement est un outil puissant qui permet de développer et tester les fonctions Inngest de manière simple et efficace. Il permet de lancer le serveur Inngest pour le développement, de tester les fonctions et de visualiser les événements et les résultats des workflows exécutés.
+
+## Les événements 
+
+Les fonctions inngest sont déclenchées au travers d'événements issus de plusieurs sources :
+
+- Depuis l'application qu'on est en train de développer
+- Via une tâche CRON (tous les soirs à 22h22)
+- Via un évènement webhook
+
+### Pourquoi utiliser des évènements et non des innvocations directes ? 
+
+#### 1- **Le Déclenchement mutiple** : Un même événement peut activer plusieurs fonctions Inngest simultanément.
+Lorsqu’un utilisateur s’inscrit (user.signup), plusieurs actions doivent être exécutées : 
+    - envoyer un e-mail de bienvenue
+    - créer un profil utilisateur
+    - enregistrer l’événement pour des analyses futures
+
+Avec **l'invocation directe**, chaque action doit être appelée explicitement, ce qui complexifie le code et augmente les dépendances entre les composants.
+
+Avec l'utilisation **d'évènements**, un seule événement (ùser.signup`) peut déclencher automatiquement toutes les fonctions nécessaires. 
+
+#### 2- Synchronisation avancée : Les événements permettent de synchroniser l’exécution des fonctions Inngest
+
+Prenons l'exemple d'une fonction qui doit attendre la validation d’un paiement avant de procéder à l’expédition d’une commande.
+
+Avec **l'invocation directe**, la fonction d’expédition doit continuellement vérifier l’état du paiement, entraînant une logique complexe et une utilisation inefficace des ressources.
+
+Avec **l'utilisation d'évènements**, la fonction d’expédition peut être configurée pour attendre un événement payment.confirmed, garantissant une synchronisation précise sans vérifications répétées.
+
+#### 3- Interopérabilité inter-applications
+
+L'utilisation d'évènements permet de découpler les applications, facilitant ainsi la communication entre elles.
+
+Une entreprise utilise plusieurs applications qui doivent réagir lorsqu’un nouveau client est ajouté.
+
+Avec **l'invocation directe**, chaque application doit implémenter des appels spécifiques pour interagir avec les autres, augmentant la complexité et les risques d’erreurs.
+
+Avec **l'utilisation d'évènements**, un événement `new.customer` peut être émis, et toutes les applications concernées peuvent s’y abonner et réagir en conséquence
+
+## Contrôle des workflows
+
+Inngest permet au travers un contrôle des workfows avancé au travers des paramètres suivants : 
+
+- **La gestion de la concurrence**: est essentielle pour optimiser l’utilisation des ressources informatiques et adapter les charges de travail. Le contrôle de concurrence d’Inngest vous permet de gérer le nombre d’étapes exécutées simultanément.
+- **La limitation de débit**: elle permet de spécifier combien d’exécutions de fonctions peuvent commencer dans une période donnée. Lorsque la limite est atteinte, les nouvelles exécutions de fonctions dépassant cette limite seront mises en file d’attente pour une exécution ultérieure. La limitation de débit fonctionne selon le principe FIFO (*First In First Out*).
+- **La limitation du taux de requêtes**: impose une limite stricte sur le nombre d’exécutions de fonctions pouvant débuter dans une période donnée. Les événements dépassant cette limite sont ignorés et ne déclenchent pas l’exécution des fonctions, ce qui prévient une surcharge du système sur une période déterminée.
+- **La priorisation**: permet d’exécuter dynamiquement certaines tâches avant ou après d’autres, en fonction de diverses données. Cela vous offre la possibilité de hiérarchiser des travaux sans recourir à une file d’attente distincte.
+
+## Diviser un workflow en plusieurs étapes: Les **steps**
+
+Les steps d’Inngest permettent de structurer un workflow en plusieurs étapes distinctes et indépendantes. Cela offre plusieurs avantages :
+- **Modularité** : Chaque étape peut être testée et exécutée séparément.
+- **Gestion des Erreurs** : Si une étape xéchoue, Inngest peut automatiquement réessayer ou reprendre l’exécution à partir de cette étape.
+- **Lisibilité** : Les workflows deviennent plus faciles à comprendre et à maintenir.
+- **Conditions** : Les étapes peuvent être conditionnées par des événements ou des données, permettant de créer des workflows adaptatifs.
+
+Il existe plusieurs méthodes pour créer des steps : 
+
+**step.run()** :  C'est la méthode la plus courante. Elle permet d'éxecuter une fonction qui sera automatiquement retentée en cas d'échec.
+
+**step.sleep()** : Permet de mettre en pause le workflow pendant un certain temps avant de reprendre l'exécution. 
+-  J'envoi un mail a un utilisateur (*step.run*)
+-  Je mets en pause le workflow pendant deux jours (*step.sleep*)
+-  Je vérifie si il a répondu a mon mail (*step.run*)
+-  Si oui, je génère une réponse automatique (*step.run*) 
+-  Si non, je le relance (*step.run*)  
+
+**step.waitForEvent()** : N'executera l'étape que lorsque l'événement spécifié sera déclenché.
+- Envoi d’un e-mail de confirmation (*step.run*)
+- On attend la réception d’une approbation (*step.waitForEvent*)
+    - Pendant cette étape, le workflow est en pause et n’avance pas tant que l’événement attendu n’est pas reçu.
+- On finalise le processus de confirmation.
+
+**step.invoke()** : Permet d'invoquer une autre fonction inngest dans le workflow. Elle permet de réutiliser des fonctions déjà écrites.
+
+## Gestion des erreurs et retry
+
+La gestion des erreurs est un aspect crucial dans tout système distribué. Inngest simplifie considérablement cette problématique en intégrant des mécanismes de reprise intelligents :
+1. Gestion automatique des erreurs
+- Détection automatique des échecs
+- Reprise intelligente des fonctions en erreur
+- Conservation de l'état entre les tentatives
+2. Types d'erreurs gérées
+- Timeouts réseau
+- Pannes temporaires de services
+- Conflits de base de données
+- Erreurs de connexion API
+3. Bénéfices
+- Robustesse accrue des workflows
+- Réduction du code de gestion d'erreurs
+- Meilleure résilience des applications
+
+Cette approche "retry-first" d'Inngest vous permet de vous concentrer sur votre logique métier plutôt que sur la gestion des cas d'erreur, tout en garantissant la fiabilité de vos workflows.
+
+**Reprises automatiques** : Par défaut, Inngest réexécute une fonction ou une étape jusqu’à quatre fois après une tentative initiale infructueuse, totalisant ainsi cinq tentatives d’exécution. Cela assure une résilience face aux erreurs transitoires telles que les délais d’attente réseau ou les indisponibilités temporaires de services.
+
+**Configurer la reprise sur erreur**: Vous pouvez personnaliser le nombre de reprises pour chaque fonction afin de les adapter à des cas d’utilisation spécifiques. Définir le nombre de reprises à zéro désactive entièrement les reprises automatiques.
+
+**Reprises au niveau des steps inngest** : Les fonctions peuvent être décomposées en plusieurs steps, chacune disposant de sa propre logique de reprise. En cas d’échec d’une étape particulière, seule cette étape est retentée, permettant une gestion des erreurs plus fine et une récupération plus efficace.
+
+**Erreurs non réessayables** : Dans les situations où une erreur est permanente (par exemple, une entrée invalide), vous pouvez déclencher une erreur non réessayable pour empêcher toute nouvelle tentative et provoquer immédiatement l’échec de l’étape ou de la fonction concernée.
+
+**Personnalisation du timing des reprises** : Inngest utilise par défaut une stratégie de reprise avec délai exponentiel et variation aléatoire. Cependant, il est possible de spécifier des timings de reprise précis, par exemple en respectant un en-tête ‘Retry-After’ d’une API externe, afin de mieux gérer les limitations de taux et d’éviter des reprises inutiles.
+
+## Le Rollback
+
+Le rollback est une fonctionnalité qui permet de revenir à l'état précédent un workflow en cas d'échec. Voyons rapidement ce que propose Inngest : 
+
+Inngest offre des mécanismes de rollback au niveau des steps de vos workflows. Lorsqu’un step échoue après avoir épuisé toutes ses tentatives de réexécution, une StepError est générée. Cela vous permet de gérer les échecs de chaque étape de manière granulaire et de récupérer élégamment des erreurs sans compromettre l’ensemble du workflow.
+
+## Installation d'Inngest
+
+Passons maintenant à la pratique. Commençons par l'installation d'Inngest dans un projet Next.js. Nous verrons ensuite comment l'utiliser dans un projet Python.
+
+### Dans une application Next.js
+
+Installation du SDK de Inngest; Permettant de créer les fonctions Inngest
+
+```bash
+    npm install inngest
+```
+
+Installation et lancement du serveur de développement Inngest; Permettant de lancer le serveur Inngest pour le développement
+
+```bash
+    npx inngest-cli@latest dev
+```
+
+Création d'un singleton Inngest
+
+Dans le fichier `src/inngest/client.ts`
+
+```Typescript
+    import { Inngest } from "inngest";
+
+    export const inngest = new Inngest({ id: "analyzeurbiz" });
+```
+
+Nous avons maintenant à définir la route inngest dans le fichier `src/app/api/inngest/route.ts` pour permettre à Inngest de communiquer avec l'application.
+
+```ts
+    import { serve } from "inngest/next";
+    import { inngest } from "../../../inngest/client";
+
+    export const { GET, POST, PUT } = serve({
+        client: inngest,
+        functions: [
+            
+        ],
+    });
+```
+
+[Accéder à l'interface de développement](http://localhost:8288)
+
+### Dans un projet Python
+
+Création d'un environnement virtuel et installation des dépendances
+
+```bash
+    python -m venv .venv && source .venv/bin/activate   #création et activation d'un virtual env
+    pip install fastapi inngest uvicorn
+```
+
+Création du singleton Inngest
+
+Dans le fichier `inngest/client.py`
+
+```python
+    import inngest
+    import logging
+
+    class InngestClientSingleton:
+        _instance = None
+
+        def __new__(cls, app_id: str):
+            if cls._instance is None:
+                cls._instance = super(InngestClientSingleton, cls).__new__(cls)
+                cls._instance.client = inngest.Inngest(app_id=app_id, 
+                                                       logger=logging.getLogger("uvicorn"))
+            return cls._instance
+
+        def get_client(self):
+            return self.client
+```
+
+Création d'un fichier `main.py` (Api FastAPI pour la communication avec le moteur Inngest)
+
+```python
+    from fastapi import FastAPIfrom fastapi import FastAPI
+    from inngest.client import InngestClientSingleton
+
+    app = FastAPI()
+
+    app_id = "analyzeurbiz"
+    singleton = InngestClientSingleton(app_id)
+    inngest_client = singleton.get_client()
+
+    inngest.fast_api.serve(app, inngest_client, [my_function])
+```
+
+
+lancement du serveur de développement Inngest (deux manière différentes)
+
+1. En utilisant node et l'application Next.js
+
+```bash
+    npx inngest-cli@latest dev -u http://127.0.0.1:8000/api/inngest --no-discovery
+```
+
+2. En utilisant docker
+
+```bash
+    docker run -p 8288:8288 inngest/inngest \
+        inngest dev -u http://host.docker.internal:8000/api/inngest --no-discovery
+```
+
+[Accéder à l'interface de développement](http://localhost:8288)
+
+## Exemple concrets : 
+
+### Envoi d'un mail avec Resend et Inngest: 
+
+Au sein d'une application comme Analyzeurbiz, la communication asynchrone avec les utilisateurs se fait principalement par le biais d'emails. l'envoi de ces derniers peut parfois être bloquant (l'application doit attendre l'envoi final du mail pour reprendre son fonctionnement). Ici l'approche synchrone est donc à éviter pour favoriser l'expérience utilisateur. On va donc créer une fonction inngest qui va nous permettre d'envoyer un mail de contact suite à la soummission d'un formulaire. 
+
+![Inngest mail](/inngest-workflow-1.png)
+
+#### En typescript avec le framework Next.js
+
+Dans le fichier `src/inngest/functions.ts` on définit la méthode sendEmail en utilisant le client inngest.
+
+```typescript
+    import { inngest } from '@/inngest/client';
+    import { Resend } from '@resend/node';
+
+    const resend = new Resend('your_resend_api_key');
+
+    export const sendEmail = inngest.createFunction(
+    { name: 'Send Email' },
+    { event: 'app/send_email' },
+    async ({ event, step }) => {
+        const emailData = {
+        from: 'sender@example.com',
+        to: 'recipient@example.com',
+        subject: 'Hello from Inngest and Resend',
+        html: '<h1>Welcome!</h1><p>This is a test email.</p>',
+        };
+        const response = await resend.emails.send(emailData);
+        console.log('Email sent:', response);
+    }
+    );
+```
+
+On ajoute cette fonction à la liste des fonctions à exécuter dans le fichier `src/app/api/inngest/route.ts`. Cette étape est nécessaire pour que le serveur de développement Inngest connaitre la fonction et l'éxecuter.
+
+```typescript
+    import { serve } from "inngest/next";
+    import { inngest } from "@/inngest/client";
+
+    export const { GET, POST, PUT } = serve({
+        client: inngest,
+        functions: [
+            sendEmail
+        ],
+    });
+```
+
+#### En Python 
+
+Dans le fichier `main.py`
+
+```python
+
+    import logging
+    from fastapi import FastAPI
+    import inngest
+    import inngest.fast_api
+    from resend import Resend
+
+    resend_client = Resend(api_key="your_resend_api_key")
+
+    @inngest_client.create_function(
+        fn_id="send_email_function",
+        trigger=inngest.TriggerEvent(event="app/send_email"),
+    )
+    async def send_email(ctx: inngest.Context, step: inngest.Step) -> str:
+        email_data = {
+            "from": "sender@example.com",
+            "to": ["recipient@example.com"],
+            "subject": "Hello from Inngest and Resend",
+            "html": "<h1>Welcome!</h1><p>This is a test email.</p>",
+        }
+        response = resend_client.send_email(**email_data)
+        ctx.logger.info(f"Email sent: {response}")
+        return "Email sent successfully"
+```
+
+On utiliser le décorateur `@inngest_client.create_function` pour créer la fonction inngest. Ce décorateur permet d'ajouter de nombreux paramètres que nous verrons dans les prochains cas d'usage.
+
+### Gestion d'un workflow multiSteps
+
+Le workflow que nous allons mettre en place consiste à enrichir des données utilisateur avec des informations générées par une IA (ex. : résumé, tags, etc.) et à stocker ces informations dans une base de données.
+
+![Inngest workflow](/inngest-workflow-2.png)
+
+On verra au fur et à mesure de la mise en place de ce workflow les différentes notions précédemments évoqués.
+
+##### En typescript avec le framework Next.js
+
+Dans le fichier `src/inngest/functions.ts` on définit la méthode enrichUserData en utilisant le client inngest.
+
+```typescript
+    import { inngest } from "inngest";
+
+    export const enrichUserData = inngest.createFunction(
+        { name: "Enrich User Data" },
+        { event: "user.signup" },
+        async ({ step, event }) => {
+            const formData = await step.run("Retrieve Form Data", async () => {
+                return getFormData(event.data.formId);
+            });
+
+            const enrichedData = await step.run("Call AI API", async () => {
+                return callAIAPI(formData);
+            });
+
+            const updatedData = await step.run("Update Data with New Info", async () => {
+                return enrichWithAdditionalInfo(enrichedData);
+            });
+
+            await step.run("Save to Database", async () => {
+                return saveToDatabase(updatedData);
+            });
+        }
+    );
+```
+
+Ajout de la fonction à la liste des fonctions à exécuter dans le fichier `src/app/api/inngest/route.ts`.
+
+```typescript
+    import { serve } from "inngest/next";
+    import { inngest } from "@/inngest/client";
+
+    export const { GET, POST, PUT } = serve({
+        client: inngest,
+        functions: [
+            enrichUserData
+        ],
+    });
+```
+
+##### En Python
+
+```python
+@inngest.function(name="Enrich User Data")
+async def enrich_user_data(event):
+    form_data = await step_run("Retrieve Form Data", get_form_data, event["data"]["form_id"])
+    enriched_data = await step_run("Call AI API", call_ai_api, form_data)
+    updated_data = await step_run("Update Data with New Info", enrich_with_additional_info, enriched_data)
+    await step_run("Save to Database", save_to_database, updated_data)
+```
+
+Ajoutons maintenant une limitation pour respecter les quotas de notre API AI. L'api est limitée à 10 requêtes par minute. 
+
+##### En typescript
+
+```ts
+const throttledCallAIAPI = inngest.rateLimit(callAIAPI, {
+  max: 10, // ->  Maximum de 10 appels
+  window: "1s", // -> Par seconde
+});
+
+export const enrichUserData = inngest.createFunction(
+  { name: "Enrich User Data" },
+  { event: "user.signup" },
+  async ({ step, event }) => {
+    const formData = await step.run("Retrieve Form Data", async () => {
+      return getFormData(event.data.formId);
+    });
+
+    const enrichedData = await step.run("Call AI API", async () => {
+      return throttledCallAIAPI(formData);
+    });
+
+    const updatedData = await step.run("Update Data with New Info", async () => {
+      return enrichWithAdditionalInfo(enrichedData);
+    });
+
+    await step.run("Save to Database", async () => {
+      return saveToDatabase(updatedData);
+    });
+  }
+);
+```
+
+##### En Python
+
+```python
+async def throttled_call_ai_api(data):
+    await inngest.rate_limit(
+        max_calls=10,
+        window="1s"
+    )
+    return await call_ai_api(data)
+
+@inngest.function(name="Enrich User Data")
+async def enrich_user_data(event):
+    form_data = await step_run("Retrieve Form Data", get_form_data, event["data"]["form_id"])
+    enriched_data = await step_run("Call AI API", throttled_call_ai_api, form_data)
+    updated_data = await step_run("Update Data with New Info", enrich_with_additional_info, enriched_data)
+    await step_run("Save to Database", save_to_database, updated_data)
+```
+
+Ajoutons la gestion automatique des erreurs avec des retries exponentiels. Les retries exponentiels sont une stratégie de gestion des erreurs où le délai entre chaque tentative augmente exponentiellement. Par exemple :
+- 1ère retry : 1 seconde
+- 2ème retry : 2 secondes 
+- 3ème retry : 4 secondes
+- 4ème retry : 8 secondes
+
+Implémentons cette stratégie dans notre workflow :
+
+##### En typescript
+
+```ts
+    export const enrichUserData = inngest.createFunction(
+        { name: "Enrich User Data" },
+        { event: "user.signup" },
+        async ({ step, event }) => {
+            const formData = await step.run("Retrieve Form Data", async () => {
+                return getFormData(event.data.formId);
+            });
+
+            const enrichedData = await step.run("Call AI API", async () => {
+                return callAIAPI(formData);
+            }, { retry: { attempts: 3, backoff: "exponential" } });
+
+            const updatedData = await step.run("Update Data with New Info", async () => {
+                return enrichWithAdditionalInfo(enrichedData);
+            });
+
+            await step.run("Save to Database", async () => {
+                return saveToDatabase(updatedData);
+            });
+        }
+    );
+```
+
+##### En Python
+
+```python
+    @inngest.function(name="Enrich User Data")
+    async def enrich_user_data(event):
+        form_data = await step_run("Retrieve Form Data", get_form_data, event["data"]["form_id"])
+        enriched_data = await step_run("Call AI API", call_ai_api, form_data, retries=3, backoff="exponential")
+        updated_data = await step_run("Update Data with New Info", enrich_with_additional_info, enriched_data)
+        await step_run("Save to Database", save_to_database, updated_data)
+```
+
+Intégrons un rollback pour annuler les modifications si l'étape "Call AI API" échoue.
+
+##### En typescript
+
+```ts
+    export const enrichUserData = inngest.createFunction(
+        { name: "Enrich User Data" },
+        { event: "user.signup" },
+        async ({ step, event }) => {
+            const formData = await step.run("Retrieve Form Data", async () => {
+                return getFormData(event.data.formId);
+            });
+
+            const enrichedData = await step
+            .run("Call AI API", async () => {
+                const aiResponse = await callAIAPI(formData);
+                // Sauvegarder la réponse brute de l'API pour pouvoir la restaurer si nécessaire
+                await saveRawAIResponse(event.data.userId, aiResponse);
+                return aiResponse;
+            }, { 
+                retry: { 
+                attempts: 3, 
+                backoff: "exponential" 
+                } 
+            })
+            .catch((err) =>
+                step.run("Rollback AI API Call", async () => {
+                // En cas d'échec, on supprime la réponse brute sauvegardée
+                await deleteRawAIResponse(event.data.userId);
+                // On peut aussi logger l'erreur ou effectuer d'autres actions de nettoyage
+                    console.error("AI API call failed:", err);
+                }),
+            );
+
+            const updatedData = await step.run("Update Data with New Info", async () => {
+                return enrichWithAdditionalInfo(enrichedData);
+            });
+
+            await step.run("Save to Database", async () => {
+                return saveToDatabase(updatedData);
+            });
+        }
+    );
+```
+
+##### En Python
+
+Cette fonctionnalité n'est pas encore disponible dans le SDK Python. Je mettrai à jour ce post dès que ce sera le cas.
+
+On pourrait encore ajouter beaucoup de fonctionnalités à notre workflow. Par exemple : 
+- Attendre l'event `user.first_login_after_signup` pour envoyer un email de bienvenue par exemple en utilisant le step `step.waitForEvent()`
+- Détection du niveau d’abonnement : Identifier le niveau d’abonnement (premium, standard, gratuit) à partir des données utilisateur ou d’une base de données.
+    - **Attribution de priorité** : Assigner une priorité numérique (ex. : 1 pour premium, 2 pour standard, 3 pour gratuit) pour classer les tâches.
+    - **Ordonnancement dynamique** : Traiter les tâches par priorité, en exécutant d’abord celles des utilisateurs premium.
+    - **Throttling par catégorie** : Limiter les appels API par utilisateur selon leur abonnement (ex. : 20/min pour premium, 10/min pour standard, 5/min pour gratuit).
+    - **Retry personnalisé** : Ajuster les tentatives de réessai et les délais selon la priorité (plus de tentatives pour les abonnés premium).
+    - **Gestion équitable des ressources** : Suspendre ou ralentir les tâches des utilisateurs de niveau inférieur en cas de surcharge.
+
+## Inngest: ses avantages et ses inconvénients :
+
+**Avantages** :
+- Intégration simplifiée : Les SDK d’Inngest s’intègrent facilement dans les bases de code existantes, permettant aux développeurs de créer rapidement des fonctions fiables sans gérer l’infrastructure sous-jacente. ￼
+- Flexibilité : Inngest est adapté à divers cas d’utilisation, notamment les workflows durables, les files d’attente, les tâches en arrière-plan et les travaux planifiés ou cron. ￼
+- Scalabilité : La plateforme est conçue pour évoluer avec les besoins des applications modernes, assurant une gestion efficace des processus à grande échelle. ￼
+
+**Inconvénients** :
+- Courbe d’apprentissage : Bien qu’Inngest simplifie l’orchestration des workflows, les développeurs novices peuvent nécessiter un temps d’adaptation pour maîtriser pleinement ses fonctionnalités.
+- Dépendance à la plateforme : L’adoption d’Inngest peut entraîner une dépendance vis-à-vis de cet outil pour la gestion des workflows, ce qui pourrait poser des défis en cas de migration vers une autre solution.
+
+En somme, Inngest est une solution puissante pour les équipes de développement souhaitant orchestrer et automatiser des workflows asynchrones de manière efficace, avec une intégration simplifiée et une flexibilité adaptée aux besoins des applications modernes.
+
+Dans un prochain article, je vous présenterai le **Workflow Kit d’Inngest**, un ensemble d’outils open source qui facilite la création de workflows personnalisés. Ce kit offre des actions prédéfinies pour le moteur de workflow et des composants React prêts à l’emploi pour construire votre interface d’édition de workflows.
+
