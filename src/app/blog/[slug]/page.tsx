@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from 'next/link';
+import { ShareButtons } from "@/components/ShareButtons";
 
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
@@ -77,12 +78,21 @@ export default async function Blog({
 
   return (
     <section id="blog">
-      <Link 
-        href="/blog"
-        className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 mb-8 block"
-      >
-        ← Retour à la liste des articles
-      </Link>
+      <div className="flex align-middle items-center justify-between">
+        <Link 
+          href="/blog"
+          className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 block"
+        >
+          ← Retour à la liste des articles
+        </Link>
+        <div className="mt-1">
+          <ShareButtons 
+            url={`${DATA.url}/blog/${post.slug}`}
+            title={post.metadata.title}
+            description={post.metadata.descriptionSocials}
+          />
+        </div>
+      </div>
       
       <script
         type="application/ld+json"

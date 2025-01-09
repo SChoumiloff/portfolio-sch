@@ -17,7 +17,7 @@ export default async function BlogPage() {
   const posts = await getBlogPosts();
 
   return (
-    <section>
+    <section className="max-w-2xl mx-auto px-6">
       <BlurFade delay={BLUR_FADE_DELAY}>
         <h1 className="font-medium text-2xl mb-8 tracking-tighter">Carnet de Bord</h1>
       </BlurFade>

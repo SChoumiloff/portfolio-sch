@@ -12,6 +12,7 @@ type Metadata = {
   publishedAt: string;
   summary: string;
   image?: string;
+  descriptionSocials?: string;
   author: string;
   keywords: string[];
 };
