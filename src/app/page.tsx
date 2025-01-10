@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from 'next/navigation';
 import { useState } from "react";
 import BlurFade from "@/components/magicui/blur-fade";
@@ -112,7 +113,7 @@ const ContactForm = () => {
   );
 };
 
-export default function Page() {
+const PageContent = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   
@@ -281,5 +282,13 @@ export default function Page() {
         </div>
       </section>
     </main>
+  );
+};
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent />
+    </Suspense>
   );
 }
