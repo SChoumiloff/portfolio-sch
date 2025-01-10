@@ -6,10 +6,14 @@ export const DATA = {
   initials: "SC",
   url: "https://dataelevation.dev",
   location: "Dijon, France",
-  description:
+  description_classic:
     "Ingénieur logiciel, entrepreneur, j'aime construire et déployer des solutions innovantes. Polyvalent, j'aime intervenir dans toutes les phases du développement de produit.",
-  summary:
-    "Mi-2024, j'ai quitté mon job d'ingénieur data à la forge, pour développer mon premier SaaS [Analyzeurbiz](https://analyzeurbiz.com). J'ai réalisé un [master en base de données et intelligence artificielle à l'université de Bourgogne.](/#education). Je suis également disponible pour des missions freelance à courte et moyenne durée.",
+  description_automate_consult:
+    "Ingénieur logiciel et entrepreneur passionné, je conçois et déploie des solutions innovantes pour automatiser les processus métiers. Polyvalent, j’interviens à chaque étape du développement produit, aidant les PME à optimiser leurs opérations et à accroître leur chiffre d’affaires.",
+  summary_classic:
+    "Mi-2024, j'ai quitté mon job d'ingénieur data à la forge, pour développer mon premier SaaS [Analyzeurbiz](https://analyzeurbiz.com). J'ai réalisé un [master en base de données et intelligence artificielle à l'université de Bourgogne](/#education). Je suis également disponible pour des missions freelance à courte et moyenne durée.",
+  summary_automate_consult:
+  "En 2024, j’ai quitté mon poste d’ingénieur data chez La Forge pour me consacrer à l’automatisation des processus métiers. Notamment, avec RTI Exploration, nous avons réduit certaines tâches de plusieurs semaines à moins de 40 minutes. Titulaire du master [base de données et intelligence artificielle de l'université de Bourgogne](/#education), je propose désormais des services d’accompagnement pour optimiser vos processus et améliorer votre performance opérationnelle et financière.",
   avatarUrl: "https://cdn.analyzeurbiz.com/me.png",
   skills: [
     "Python",

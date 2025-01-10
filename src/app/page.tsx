@@ -1,7 +1,7 @@
 "use client";
 
+import { useSearchParams } from 'next/navigation';
 import { useState } from "react";
-import { HackathonCard } from "@/components/hackathon-card";
 import BlurFade from "@/components/magicui/blur-fade";
 import BlurFadeText from "@/components/magicui/blur-fade-text";
 import { ProjectCard } from "@/components/project-card";
@@ -113,6 +113,18 @@ const ContactForm = () => {
 };
 
 export default function Page() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+  
+  // Choose description based on URL parameter
+  const description = id === '123Xur' 
+    ? DATA.description_automate_consult 
+    : DATA.description_classic;
+
+  const summary = id === '123Xur' 
+    ? DATA.summary_automate_consult 
+    : DATA.summary_classic;
+
   return (
     <main className="flex flex-col min-h-[100dvh] max-w-2xl mx-auto space-y-10">
       <section id="hero">
@@ -128,7 +140,7 @@ export default function Page() {
               <BlurFadeText
                 className="max-w-[600px] md:text-xl"
                 delay={BLUR_FADE_DELAY}
-                text={DATA.description}
+                text={description}
               />
             </div>
             <BlurFade delay={BLUR_FADE_DELAY}>
@@ -146,7 +158,7 @@ export default function Page() {
         </BlurFade>
         <BlurFade delay={BLUR_FADE_DELAY * 4}>
           <Markdown className="prose max-w-full text-pretty font-sans text-sm text-muted-foreground dark:prose-invert">
-            {DATA.summary}
+            {summary}
           </Markdown>
         </BlurFade>
       </section>
