@@ -27,6 +27,8 @@ export const DATA = {
     "Spring Boot",
     "Docker",
     "Kubernetes",
+    "GCP",
+    "VPS"
   ],
   navbar: [
     { href: "/", icon: HomeIcon, label: "Home" },
