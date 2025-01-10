@@ -111,7 +111,7 @@ export const DATA = {
       href: "https://www.u-bourgogne.fr/",
       degree: "Licence mathématiques et informatique",
       logoUrl: "/ub.png",
-      start: "2028",
+      start: "2018",
       end: "2020",
     }
   ],
