@@ -14,7 +14,7 @@ import Markdown from "react-markdown";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from 'sonner';
 
 const BLUR_FADE_DELAY = 0.04;
@@ -287,7 +287,13 @@ const PageContent = () => {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense 
+      fallback={
+        <div className="min-h-[100dvh] w-full flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-foreground/60" />
+        </div>
+      }
+    >
       <PageContent />
     </Suspense>
   );
