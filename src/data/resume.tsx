@@ -259,6 +259,21 @@ export const DATA = {
       image: "/vertigo.png",
       video: "",
     },
+    {
+      title: "BAT (Binance automatic trading)",
+      dates: "Septembre 2020 - Aout 2022",
+      description: "Développement d'un bot de trading automatique en utilisant l'API de Binance avec plus de 300 indicateurs techniques disponibles et configurables. BAT permet de générer des stratégies de trading AI en se basant sur des données historiques. BAT permet de créer ses propres stratégies au travers d'une simple configuration json, enfin il permet d'évaluer la performance des stratégies grace à une solution de backtesting.",
+      technologies: [
+        "Java",
+        "SpringBoot",
+        "Binance API"
+      ],
+      active: false,
+      video: "",
+      image: "/bat.jpg",
+      links: [],
+      href: "",
+    }
   ],
 
 } as const;
