@@ -27,6 +27,7 @@ export async function generateMetadata({
     summary: description,
     image,
     keywords,
+    keywordsSEO,
   } = post.metadata;
   
   let ogImage = image 
@@ -36,7 +37,7 @@ export async function generateMetadata({
   return {
     title: `${title} | Blog Tech Sacha Choumiloff`,
     description,
-    keywords,
+    keywords: keywordsSEO,
     openGraph: {
       title,
       description,

@@ -15,6 +15,7 @@ type Metadata = {
   descriptionSocials?: string;
   author: string;
   keywords: string[];
+  keywordsSEO: string[];
 };
 
 function getMDXFiles(dir: string) {
