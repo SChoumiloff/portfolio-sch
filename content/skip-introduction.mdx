@@ -1,0 +1,166 @@
+---
+title: "Skip: Le framework pour la programmation réactive"
+publishedAt: "2025-01-17"
+summary: "Skip est un framework pour la programmation backend réactive qui permet de créer des applications performantes et scalables. Il utilise des techniques avancées de programmation réactive pour permettre de gérer des flux de données en temps réel."
+keywords: ["skip framework", "programmation réactive", "backend", "meta", "computation graph", "real-time", "reactive programming"]
+keywordsSEO: ["skip framework", "programmation réactive", "backend reactif", "meta framework", "computation graph", "real-time backend", "reactive programming", "skip meta", "framework meta", "graphe de calcul", "backend temps réel", "skip runtime", "skip nodejs", "skip sdk", "architecture reactive", "développement reactif", "backend moderne", "skip collections", "skip mappers", "skip services", "ressources reactives", "server sent events", "sse", "backend event-driven", "meta open source", "skip documentation", "skip tutorial", "skip example", "skip implementation", "skip architecture"]
+author: "Sacha Choumiloff"
+image: "/skip-logo.svg"
+tags: ["SaaS", "Development", "Stack Technique", "Web"]
+readingTime: "15 min"
+---
+
+# Skip: Le framework pour la programmation backend réactive
+
+Skip est un nouveau framework open source, développé par Meta, qui apporte au back-end une approche réactive similaire à celle qu'on connaît avec React côté front-end. L'idée est de construire un "computation graph" (Graphe de calcul) entre vos données (en base, via API, etc.) et la façon dont elles sont exposées à vos clients.
+
+## Qui suis-je ?
+
+Je suis **Sacha Choumiloff**, ingénieur logiciel et entrepreneur. Mon objectif à travers ces articles est de vous présenter des outils et des techniques qui, je l'espère, sauront vous inspirer et vous aider à construire ou améliorer vos propres projets.
+
+
+## Un `computation graph` c'est quoi ? 
+
+C'est une représentation graphique d'un ensemble de calculs ou d'opérations, où les nœuds représentent des opérations ou des variables, et les arêtes représentent les dépendances ou les flux de données entre elles.
+
+Par exemple, voici un polynôme de degré 2 :
+
+$$
+f(x) = \alpha x^2 + \beta x + c
+$$
+
+Et son `computation graph` : 
+
+![computation graph of a polynome](/skip-computation-graph.png)
+
+Nous verrons dans la suite de l'article comment Skip permet de gérer ce `computation graph` de manière transparente pour le développeur.
+
+## Pourquoi Skip est intéressant
+- "Runtime" réactif : Skip suit un modèle « déclaratif » ; vous spécifiez des collections (données) et des mappers (transformations). Chaque changement local ou en base se propage en continu jusqu'aux clients souscrits, sans refetch massif.
+- Équivalent à React… mais côté serveur : Tout comme React a simplifié la gestion d'état côté frontend, Skip se propose de résoudre le problème des données "toujours à jour" au niveau back-end.
+- Production-ready chez Meta : Il est déjà déployé sur des projets internes. C'est un signe de maturité, même si l'outillage externe (exemples, docs, etc.) est encore jeune pour le grand public.
+- Un gain potentiel énorme : Fini les multiples appels d'invalidation ou la coordination compliquée entre microservices. Skip s'occupe de la "plomberie" pour vous, en s'appuyant sur son graphe de dépendances.
+
+Comment Skip fonctionne et quels sont les éléments à connaitre ? 
+
+1.	Collections :
+    Une collection est la structure de données fondamentale de Skip. Elle permet d'associer des clés à une ou plusieurs valeurs (pouvant être n'importe quel type de données JSON). Les collections peuvent être :
+    - **Eager (avide)** : Les données sont maintenues constamment à jour
+    - **Lazy (paresseuse)** : Les valeurs ne sont calculées et mises à jour qu'en réponse à des requêtes spécifiques pour une clé donnée
+    Les collections peuvent être issues de plusieurs sources (API, base de données, websocket, etc...)
+
+2. Mappers :
+    Les mappers définissent les transformations entre les clés/valeurs d'une collection vers une autre collection. Ils constituent les arêtes du graphe de calcul réactif de Skip, en spécifiant les transformations et les compositions de données pour produire des résultats intermédiaires et finaux. 
+    
+    Trois caractéristiques essentielles des mappers :
+    - **Déterministes** : Pour une entrée donnée, ils produisent toujours la même sortie
+    - **Sans effets de bord** : Ils ne modifient pas d'état externe
+    - **Composables en série pour construire un graphe** : si A change, B est recalculé, si B change, C est recalculé, etc...
+
+    Ces propriétés permettent au moteur réactif de Skip de ré-exécuter les mappers selon les besoins pour maintenir des résultats à jour et cohérents. Le résultat sera toujours identique à celui qu'on obtiendrait en exécutant le calcul complet depuis le début avec les données d'entrée actuelles.
+
+3. Les Services Skip :
+   Un service dans Skip est un composant « réactif » qui tourne sur un hôte (ou serveur) et utilise le Skip Runtime pour :
+   - **Gérer ses données d'entrée (input collections)** : Par exemple, des tables issues d'une base de données, des données en mémoire, ou même des données provenant d'un autre service Skip.
+   - **Interagir avec des services externes** : Un service Skip peut dépendre d'autres services Skip (pour construire une architecture distribuée réactive). Il peut également consulter des API non-réactives via HTTP, qu'il synchronise ensuite avec son propre graphe de données.
+   - **Maintenir et exposer un graphe de calcul réactif** : À partir des données d'entrée (et éventuellement des données externes), on définit comment produire les résultats finaux. À partir des données d'entrée (et éventuellement des données externes), on définit comment produire les résultats finaux.
+
+4. Les Ressources réactives :
+   L'output (ou "le produit") d'un service Skip prend la forme d'une ou plusieurs ressources. Chaque ressource :
+   - **Réagit aux changements** : si la base de données, un service externe ou une collection quelconque change, la ressource se met à jour automatiquement.
+   - **Peut être paramétrée** : lorsqu'un client fait une requête sur la ressource, il peut spécifier des paramètres (par ex. un userId). Le service crée alors une « instance » de cette ressource qui restera à jour, tant que le client est abonné.
+   - **Est accessible en mode réactif ou « classique »** :
+     - En mode réactif, le client souscrit à la ressource via des événements (Server-Sent Events, SSE) et reçoit en continu l'état initial (init) puis les mises à jour (update).
+     - Les clients "légacy" peuvent faire des requêtes ponctuelles (REST, JSON…) pour récupérer l'état à un instant T, sans souscription continue.
+
+Voici une démonstration visuelle (sans code) de l'exemple « amis actifs », afin d'illustrer comment Skip gère le flux de données au sein de son graphe de calcul réactif. Nous allons représenter les collections, les mappers, le service, et la ressource finale.
+
+Pour illustrer la puissance de Skip, prenons un cas d'usage courant dans une application sociale : l'affichage en temps réel des amis actifs partageant les mêmes groupes que l'utilisateur.
+
+### Sources de données
+Notre service Skip s'appuie sur deux collections principales :
+- Une collection `users` contenant les profils utilisateurs (statut de connexion, relations)
+- Une collection `groups` gérant les appartenances aux groupes
+
+### Objectif
+Créer une ressource réactive `activeFriends` qui, pour un utilisateur donné :
+- Surveille l'état de connexion de ses amis
+- Filtre ces amis selon leurs groupes communs
+- Met à jour ces informations instantanément
+
+Le graphe de calcul Skip se charge automatiquement de propager les changements. Que ce soit une connexion, déconnexion, ou modification des groupes, les clients souscris à la ressource `activeFriends` reçoivent les mises à jour en temps réel.
+
+![ressources example skip](/skip-example-ressource.png)
+
+- **users (Eager)** : collection où chaque clé est un userId et la valeur un objet { name, active, friends: [...] }.
+- **groups (Eager)** : collection où chaque clé est un groupId et la valeur un objet { name, members: [...] }.
+
+*(Ici, nous supposons que les deux collections sont "eager" : toujours chargées à jour. Mais elles pourraient être "lazy" si le service choisit de ne charger les données qu'à la demande.)*
+
+![skip example computation graph](/skip-example-computation-graph.png)
+
+1.	ActiveUsers : prend la collection groups et utilise également les informations de users pour déterminer quels membres de chaque groupe sont actifs.
+    - Résultat : une nouvelle collection actives où chaque clé est un groupId et la valeur est la liste des userId actifs dans ce groupe.
+2.	FilterFriends : prend la collection actives (membres actifs par groupe) et l'information de l'utilisateur courant (celui qui appelle la ressource).
+    - Résultat : ne garde que les amis (donc présents dans la liste friends[] de l'utilisateur) parmi les userId actifs dans chaque groupe.
+    - On obtient ainsi une nouvelle collection où chaque clé est un groupId et la valeur est « la liste des amis actifs pour cet utilisateur ».
+3.	Ressource activeFriends :
+    - Rassemble les données finales pour l'utilisateur qui a fait la requête (ex. uid = 123).
+    - Accessible par :
+        - Souscription (SSE) : le client reçoit un événement init avec la liste de ses amis actifs dans chaque groupe, puis des événements update si des changements ont lieu.
+        - Requête classique (type REST) : le client demande l'état de la ressource à un instant T (sans souscription).
+### Fonctionnement réactif: l'exemple d'un changement
+
+**Situation** : l'ami Alice (userId=101) se connecte (passe de active=false à active=true).
+
+1.	La collection users est mise à jour en interne (détection de l'évenement de connexion sur et mise à jour du statut en base de données via une API). Le reactive Service Skip en est notifié.
+2.	Skip détecte que la valeur de users[101].active a changé.
+3.	Le mapper ActiveUsers (qui dépend de users) re-calcule la liste des membres actifs pour chaque groupe contenant 101.
+4.	La collection actives est donc mise à jour : groups[gX].members intègre 101 si ce userId appartient aux groupes de Alice.
+5.	Le mapper FilterFriends, qui dépend de actives et de l'utilisateur courant uid=123, s'exécute pour chaque groupe commun.
+6.	La ressource activeFriends, qui dépend de FilterFriends, est automatiquement mise à jour.
+7.	Tous les clients souscrits à cette ressource activeFriends (ex. l'application mobile de l'utilisateur uid=123) reçoivent un événement update :
+
+```json
+{
+    "event": "update",
+    "data": {
+        "groupIdXYZ": [101, 105, ...] 
+    }
+}
+```
+
+*(101 a rejoint la liste des amis actifs, 105 était déjà actif, etc.)*
+
+Le tout, sans qu'un code impératif spécifique (du type « si Alice se connecte, update la liste d'amis pour chaque groupe, etc. ») ne soit écrit. Skip s'occupe de la cascade de changements grâce au graphe de dépendances défini par nos mappers et collections.
+
+## Ou s'intègre Skip
+
+![skip integration](/skip-integration.png)
+
+⚠️ Skip ne remplace pas les frameworks existants, il sert d'intermédiaire, de tuyaux entre les clients et les services externes ou backends existants. Dans le cadre de l'exemple précédent, **Skip** ne remplace pas la logique backend (serveur) définissant la manière dont le statut actif d'un utilisateur est modifié. Plusieurs services Skip peuvent être mis en parrallèles, simplifiant et découpant les fonctionnalités et le code. 
+
+## Ce que Skip n'est pas
+- Pas un remplaçant "all-in-one" : Ce n'est ni un framework web à la Express/Nest ni un ORM magique. C'est plutôt une couche réactive qui s'intègre au-dessus de vos services, bases de données et API existants.
+- Pas (encore) pour tout le monde : L'approche reste complexe à mettre en place, et l'écosystème est encore jeune. Certains concepts, comme les mappers et la configuration des ressources, demandent une certaine pratique.
+
+## Pour conclure
+
+Skip est un projet ambitieux qui introduit la réactivité côté back-end, offrant un modèle de mise à jour automatique des données (type "React") sur des sources variées. Avec la promesse de réduire la plomberie logicielle liée à la synchronisation, il suscite déjà l'intérêt chez Meta et la communauté. Bien qu'il faille encore du temps pour le voir adopté massivement, il apporte des idées novatrices qui pourraient changer notre manière de concevoir les APIs et microservices.
+
+Pour en savoir plus, consultez la documentation officielle, explorez les exemples, et gardez à l'esprit que malgré son potentiel, Skip reste aujourd'hui un framework de niche, surtout adapté aux équipes prêtes à investir dans un nouveau paradigme **très** réactif côté serveur.
+
+## Quels SDKs, pour quels langages ? 
+
+Aujourd'hui Skip propose un SDK uniquement pour l'écosystème Node.js. Des versions pour python et java sont en cours de développement. 
+
+```bash
+    npm i @skipruntime/api @skipruntime/server @skipruntime/helpers
+```
+
+## Crédits
+
+- [Site web de Skip]("https://skiplabs.io/")
+- [Github et code source]("https://github.com/SkipLabs/skip")
+- [Un exemple concret]("https://github.com/SkipLabs/skip/tree/main/examples/hackernews")
+- [La vidéo de theorants sur le sujet]("https://www.youtube.com/watch?v=DIFPVCcolO8")
