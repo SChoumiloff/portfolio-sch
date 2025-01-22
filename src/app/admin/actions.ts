@@ -13,11 +13,26 @@ interface ServiceResponse<T> {
   error?: string;
 }
 
-export async function getLinks(): Promise<ServiceResponse<any>> {
-  const cookieStore = cookies();
-  const token = cookieStore.get("auth-token");
+const isAuthenticated = async (): Promise<boolean> => {
+  try {
+    const cookieStore = cookies();
+    const token = cookieStore.get("auth-token");
+  
+    if (!token) {
+      return false
+    }
 
-  if (!token) {
+    verify(token.value, JWT_SECRET);
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+export async function getLinks(): Promise<ServiceResponse<any>> {
+  const isAuth = await isAuthenticated();
+
+  if (!isAuth) {
     return {
       success: false,
       error: "Not authenticated"
@@ -25,7 +40,6 @@ export async function getLinks(): Promise<ServiceResponse<any>> {
   }
 
   try {
-    verify(token.value, JWT_SECRET);
     const links = await prisma.link.findMany({
       include: {
         views: true
@@ -39,7 +53,7 @@ export async function getLinks(): Promise<ServiceResponse<any>> {
   } catch (error) {
     return {
       success: false,
-      error: "Invalid token"
+      error: "Une erreur est survenue"
     };
   }
 }
@@ -48,13 +62,16 @@ interface CreateLinkInput {
   name: string;
   description: string;
   link: string;
+  company?: string | null;
+  email?: string | null;
+  linkedinLink?: string | null;
+  phoneNumber?: string | null;
 }
 
 export async function createLink(input: CreateLinkInput): Promise<ServiceResponse<any>> {
-  const cookieStore = cookies();
-  const token = cookieStore.get("auth-token");
+  const isAuth = await isAuthenticated();
 
-  if (!token) {
+  if (!isAuth) {
     return {
       success: false,
       error: "Non authentifié"
@@ -62,8 +79,6 @@ export async function createLink(input: CreateLinkInput): Promise<ServiceRespons
   }
 
   try {
-    verify(token.value, JWT_SECRET);
-
     const existingLink = await prisma.link.findUnique({
       where: { link: input.link },
     });
@@ -81,10 +96,72 @@ export async function createLink(input: CreateLinkInput): Promise<ServiceRespons
         name: input.name,
         description: input.description,
         link: input.link,
+        company: input.company || undefined,
+        email: input.email || undefined,
+        linkedinLink: input.linkedinLink || undefined,
+        phoneNumber: input.phoneNumber || undefined,
       },
     });
 
-    // Revalider la page admin pour rafraîchir les données
+    revalidatePath('/admin');
+
+    return {
+      success: true,
+      data: link
+    };
+  } catch (error) {
+    console.error(error)
+    return {
+      success: false,
+      error: "Erreur lors de la création du lien"
+    };
+  }
+}
+
+interface UpdateLinkInput {
+  id: string;
+  name?: string;
+  description?: string;
+  company?: string | null;
+  email?: string | null;
+  linkedinLink?: string | null;
+  phoneNumber?: string | null;
+}
+
+export async function updateLink(input: UpdateLinkInput): Promise<ServiceResponse<any>> {
+  const isAuth = await isAuthenticated();
+
+  if (!isAuth) {
+    return {
+      success: false,
+      error: "Non authentifié"
+    };
+  }
+
+  try {
+    const existingLink = await prisma.link.findUnique({
+      where: { id: input.id },
+    });
+
+    if (!existingLink) {
+      return {
+        success: false,
+        error: "Lien introuvable"
+      };
+    }
+
+    const link = await prisma.link.update({
+      where: { id: input.id },
+      data: {
+        name: input.name ?? existingLink.name,
+        description: input.description ?? existingLink.description,
+        company: input.company ?? existingLink.company,
+        email: input.email ?? existingLink.email,
+        linkedinLink: input.linkedinLink ?? existingLink.linkedinLink,
+        phoneNumber: input.phoneNumber ?? existingLink.phoneNumber,
+      },
+    });
+
     revalidatePath('/admin');
 
     return {
@@ -94,7 +171,51 @@ export async function createLink(input: CreateLinkInput): Promise<ServiceRespons
   } catch (error) {
     return {
       success: false,
-      error: "Erreur lors de la création du lien"
+      error: "Erreur lors de la modification du lien"
+    };
+  }
+}
+
+export async function deleteLink(id: string): Promise<ServiceResponse<any>> {
+  const isAuth = await isAuthenticated();
+
+  if (!isAuth) {
+    return {
+      success: false,
+      error: "Non authentifié"
+    };
+  }
+
+  try {
+    const existingLink = await prisma.link.findUnique({
+      where: { id },
+    });
+
+    if (!existingLink) {
+      return {
+        success: false,
+        error: "Lien introuvable"
+      };
+    }
+
+    await prisma.view.deleteMany({
+      where: { linkId: id },
+    });
+
+    await prisma.link.delete({
+      where: { id },
+    });
+
+    revalidatePath('/admin');
+
+    return {
+      success: true,
+      data: null
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "Erreur lors de la suppression du lien"
     };
   }
 } 

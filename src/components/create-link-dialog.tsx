@@ -39,7 +39,11 @@ function generateShortLink() {
   return result;
 }
 
-export function CreateLinkDialog() {
+interface CreateLinkDialogProps {
+  onSuccess?: () => void;
+}
+
+export function CreateLinkDialog({ onSuccess }: CreateLinkDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -47,6 +51,10 @@ export function CreateLinkDialog() {
     description: "",
     link: generateShortLink(),
     targetRoute: "",
+    company: "",
+    email: "",
+    linkedinLink: "",
+    phoneNumber: "",
   });
   const [blogRoutes, setBlogRoutes] = useState<Route[]>([]);
 
@@ -69,6 +77,10 @@ export function CreateLinkDialog() {
         name: formData.name,
         description: formData.description,
         link: finalTargetRoute,
+        company: formData.company || null,
+        email: formData.email || null,
+        linkedinLink: formData.linkedinLink || null,
+        phoneNumber: formData.phoneNumber || null,
       });
 
       if (!result.success) {
@@ -82,7 +94,13 @@ export function CreateLinkDialog() {
         description: "",
         link: generateShortLink(),
         targetRoute: "",
+        company: "",
+        email: "",
+        linkedinLink: "",
+        phoneNumber: "",
       });
+      
+      onSuccess?.();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erreur lors de la création du lien");
     } finally {
@@ -112,7 +130,7 @@ export function CreateLinkDialog() {
           Nouveau lien
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Créer un nouveau lien court</DialogTitle>
@@ -122,7 +140,7 @@ export function CreateLinkDialog() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Nom</Label>
+              <Label htmlFor="name">Nom*</Label>
               <Input
                 id="name"
                 placeholder="Nom du lien"
@@ -133,8 +151,60 @@ export function CreateLinkDialog() {
                 required
               />
             </div>
+
             <div className="grid gap-2">
-              <Label htmlFor="targetRoute">Page cible</Label>
+              <Label htmlFor="company">Entreprise*</Label>
+              <Input
+                id="company"
+                placeholder="Nom de l'entreprise"
+                value={formData.company}
+                onChange={(e) =>
+                  setFormData({ ...formData, company: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email*</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Email de contact"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="linkedinLink">Lien LinkedIn*</Label>
+              <Input
+                id="linkedinLink"
+                type="url"
+                placeholder="https://linkedin.com/in/..."
+                value={formData.linkedinLink}
+                onChange={(e) =>
+                  setFormData({ ...formData, linkedinLink: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="phoneNumber">Numéro de téléphone*</Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                placeholder="+33 ..."
+                value={formData.phoneNumber}
+                onChange={(e) =>
+                  setFormData({ ...formData, phoneNumber: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="targetRoute">Page cible*</Label>
               <Select
                 value={formData.targetRoute}
                 onValueChange={(value) => {
@@ -146,6 +216,7 @@ export function CreateLinkDialog() {
                       .find(route => route.value === value)?.label || ""
                   });
                 }}
+                required
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez une page" />
@@ -166,8 +237,9 @@ export function CreateLinkDialog() {
                 </SelectContent>
               </Select>
             </div>
+
             <div className="grid gap-2">
-              <Label htmlFor="link">Lien court</Label>
+              <Label htmlFor="link">Lien court*</Label>
               <div className="flex gap-2">
                 <Input
                   id="link"
@@ -190,8 +262,9 @@ export function CreateLinkDialog() {
                 </Button>
               </div>
             </div>
+
             <div className="grid gap-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Description*</Label>
               <Input
                 id="description"
                 placeholder="Description du lien"
