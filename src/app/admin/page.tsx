@@ -8,15 +8,14 @@ import { columns } from "@/components/links/columns";
 import { DataTable } from "@/components/links/data-table";
 import { Suspense } from "react";
 import { CreateLinkDialog } from "@/components/create-link-dialog";
-import { getLinks } from "@/app/admin/actions";
-import { LinkWithViews } from "@/components/links/columns";
+import { useLinks } from "@/hooks/useLinks";
 
 export default function AdminPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, checkAuth } = useAuthStore();
   const showAuthDialog = searchParams.get("auth") === "required";
-  const [links, setLinks] = useState<LinkWithViews[]>([]);
+  const { links, isLoading, refreshLinks } = useLinks();
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -32,15 +31,8 @@ export default function AdminPage() {
   }, [checkAuth, showAuthDialog, router, isAuthenticated]);
 
   useEffect(() => {
-    const fetchLinks = async () => {
-      const response = await getLinks();
-      if (response.success) {
-        setLinks(response.data);
-      }
-    };
-
     if (isAuthenticated) {
-      fetchLinks();
+      refreshLinks();
     }
   }, [isAuthenticated]);
 
@@ -72,10 +64,19 @@ export default function AdminPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <CreateLinkDialog />
+              <CreateLinkDialog onSuccess={refreshLinks} />
             </div>
           </div>
-          <DataTable columns={columns} data={links} />
+          {isLoading ? (
+            <div className="flex items-center justify-center min-h-[200px]">
+              <div className="flex flex-col items-center gap-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 "></div>
+                <p className="text-sm">Chargement des liens...</p>
+              </div>
+            </div>
+          ) : (
+            <DataTable columns={columns} data={links} />
+          )}
         </div>
       </Suspense>
     </div>

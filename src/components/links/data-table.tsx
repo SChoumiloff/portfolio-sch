@@ -21,11 +21,15 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+}
+
+interface TableMeta {
+  refreshData: () => void
 }
 
 export function DataTable<TData, TValue>({
@@ -34,6 +38,11 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
+  const refreshData = useCallback(() => {
+    // Si vous utilisez useLinks ou une fonction similaire pour rafraîchir les données
+    window.location.reload()
+  }, [])
 
   const table = useReactTable({
     data,
@@ -47,6 +56,9 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       columnFilters,
+    },
+    meta: {
+      refreshData,
     },
   })
 
@@ -85,9 +97,16 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow 
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="cursor-default hover:bg-transparent"
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell 
+                      key={cell.id}
+                      className={`${cell.column.id === 'actions' ? 'relative' : ''} hover:bg-transparent`}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
