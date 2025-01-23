@@ -5,6 +5,7 @@ import { Area, AreaChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } fro
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { subMonths, subDays, subHours, startOfDay, format, parseISO } from "date-fns"
 import { fr } from "date-fns/locale"
+import { formatInTimeZone } from 'date-fns-tz'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState } from "react"
 
@@ -16,6 +17,7 @@ type TimeRange = "24h" | "3d" | "7d" | "30d" | "3m" | "1y"
 
 export function ViewsChart({ views }: ViewsChartProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>("7d")
+  const TIMEZONE = 'Europe/Paris'
 
   const getChartData = () => {
     const now = new Date()
@@ -32,7 +34,7 @@ export function ViewsChart({ views }: ViewsChartProps) {
                    viewDate < subHours(date, -1)
           })
           return {
-            date: format(date, "yyyy-MM-dd HH:00"),
+            date: formatInTimeZone(date, TIMEZONE, "yyyy-MM-dd HH:00"),
             views: hourViews.length
           }
         })
@@ -47,7 +49,7 @@ export function ViewsChart({ views }: ViewsChartProps) {
             return viewDate >= date && viewDate < subHours(date, -4)
           })
           return {
-            date: format(date, "yyyy-MM-dd HH:00"),
+            date: formatInTimeZone(date, TIMEZONE, "yyyy-MM-dd HH:00"),
             views: hourViews.length
           }
         })
@@ -61,7 +63,7 @@ export function ViewsChart({ views }: ViewsChartProps) {
             format(new Date(view.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
           )
           return {
-            date: format(date, "yyyy-MM-dd"),
+            date: formatInTimeZone(date, TIMEZONE, "yyyy-MM-dd"),
             views: dayViews.length
           }
         })
@@ -75,7 +77,7 @@ export function ViewsChart({ views }: ViewsChartProps) {
             format(new Date(view.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
           )
           return {
-            date: format(date, "yyyy-MM-dd"),
+            date: formatInTimeZone(date, TIMEZONE, "yyyy-MM-dd"),
             views: dayViews.length
           }
         })
@@ -90,7 +92,7 @@ export function ViewsChart({ views }: ViewsChartProps) {
             return viewDate >= date && viewDate < subDays(date, -3)
           })
           return {
-            date: format(date, "yyyy-MM-dd"),
+            date: formatInTimeZone(date, TIMEZONE, "yyyy-MM-dd"),
             views: periodViews.length
           }
         })
@@ -105,7 +107,7 @@ export function ViewsChart({ views }: ViewsChartProps) {
             return viewDate >= date && viewDate < subDays(date, -7)
           })
           return {
-            date: format(date, "yyyy-MM-dd"),
+            date: formatInTimeZone(date, TIMEZONE, "yyyy-MM-dd"),
             views: weekViews.length
           }
         })
@@ -119,9 +121,9 @@ export function ViewsChart({ views }: ViewsChartProps) {
     const parsedDate = parseISO(date)
     switch (timeRange) {
       case "24h":
-        return format(parsedDate, "HH'h'")
+        return formatInTimeZone(parsedDate, TIMEZONE, "HH'h'")
       case "3d":
-        return format(parsedDate, "dd MMM HH'h'", { locale: fr })
+        return formatInTimeZone(parsedDate, TIMEZONE, "dd MMM HH'h'", { locale: fr })
       case "7d":
       case "30d":
         return format(parsedDate, "dd MMM", { locale: fr })
@@ -134,8 +136,8 @@ export function ViewsChart({ views }: ViewsChartProps) {
   const chartData = getChartData()
 
   return (
-    <div className="h-full w-full rounded-lg border p-4">
-      <div className="mb-4 flex justify-end">
+    <div className="space-y-4">
+      <div className="flex justify-end">
         <Select value={timeRange} onValueChange={(value: TimeRange) => setTimeRange(value)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sélectionner une période" />
@@ -150,59 +152,62 @@ export function ViewsChart({ views }: ViewsChartProps) {
           </SelectContent>
         </Select>
       </div>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData}>
-          <defs>
-            <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis 
-            dataKey="date" 
-            tickFormatter={formatXAxisTick}
-            tickLine={false}
-            axisLine={false}
-            interval={timeRange === "24h" ? 3 : "preserveStartEnd"}
-          />
-          <YAxis 
-            tickLine={false}
-            axisLine={false}
-            allowDecimals={false}
-            tickFormatter={(value) => value.toLocaleString()}
-          />
-          <ChartTooltip 
-            content={({ active, payload, label }) => {
-              if (active && payload && payload.length) {
-                return (
-                  <div className="rounded-lg border bg-background p-2 shadow-sm">
-                    <div className="text-sm font-medium">
-                      {format(parseISO(label), 
-                        timeRange === "24h" ? "dd MMMM à HH'h'" : 
-                        timeRange === "3d" ? "dd MMMM à HH'h'" : 
-                        "dd MMMM yyyy",
-                        { locale: fr }
-                      )}
+
+      <div className="h-[250px] w-full rounded-lg border p-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis 
+              dataKey="date" 
+              tickFormatter={formatXAxisTick}
+              tickLine={false}
+              axisLine={false}
+              interval={timeRange === "24h" ? 3 : "preserveStartEnd"}
+              dy={10}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis 
+              tickLine={false}
+              axisLine={false}
+              allowDecimals={false}
+              tickFormatter={(value) => value.toLocaleString()}
+              dx={-10}
+            />
+            <ChartTooltip 
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+                      <div className="text-sm font-medium">
+                        {timeRange === "24h" || timeRange === "3d" 
+                          ? formatInTimeZone(parseISO(label), TIMEZONE, "dd MMMM à HH'h'", { locale: fr })
+                          : format(parseISO(label), "dd MMMM yyyy", { locale: fr })}
+                      </div>
+                      <div className="text-sm">
+                        {payload[0].value} vues
+                      </div>
                     </div>
-                    <div className="text-sm">
-                      {payload[0].value} vues
-                    </div>
-                  </div>
-                )
-              }
-              return null
-            }}
-          />
-          <Area
-            type="monotone"
-            dataKey="views"
-            stroke="hsl(var(--primary))"
-            fillOpacity={1}
-            fill="url(#colorViews)"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+                  )
+                }
+                return null
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="views"
+              stroke="hsl(var(--primary))"
+              fillOpacity={1}
+              fill="url(#colorViews)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   )
 } 
