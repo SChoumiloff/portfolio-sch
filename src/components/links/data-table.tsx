@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState, useCallback } from "react"
+import { ViewsChart } from "./views-chart"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -38,6 +39,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [selectedRow, setSelectedRow] = useState<TData | null>(null)
 
   const refreshData = useCallback(() => {
     // Si vous utilisez useLinks ou une fonction similaire pour rafraîchir les données
@@ -97,23 +99,36 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow 
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="cursor-default hover:bg-transparent"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell 
-                      key={cell.id}
-                      className={`${cell.column.id === 'actions' ? 'relative' : ''} hover:bg-transparent`}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <>
+                  <TableRow 
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => setSelectedRow(row.original === selectedRow ? null : row.original)}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell 
+                        key={cell.id}
+                        className={`${cell.column.id === 'actions' ? 'relative' : ''} hover:bg-transparent`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {selectedRow === row.original && (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className="p-8">
+                        <div className="rounded-lg border bg-card p-6 min-h-[300px]">
+                          <h3 className="text-lg font-semibold mb-4">Statistiques des vues</h3>
+                          <ViewsChart views={(row.original as any).views} />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </>
               ))
             ) : (
               <TableRow>
