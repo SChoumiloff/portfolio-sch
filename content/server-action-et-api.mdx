@@ -1,0 +1,241 @@
+---
+title: "NextJs : Server function et API route ?"
+publishedAt: "2025-02-03"
+summary: "Découvrez les différences entre les server functions et les API routes dans Next.js, et comment choisir la bonne méthode pour votre application."
+author: "Sacha Choumiloff"
+image: "/nextjs-logo.svg"
+tags: ["Next.js", "Server functions", "API Routes", "Développement Web"]
+readingTime: "5 min"
+---
+
+
+# Next.js : Server function et API route ?
+Depuis sa création, Next.js s'est imposé comme l'un des frameworks React les plus puissants et populaires. Mais au-delà du simple rendu côté serveur (SSR) ou de la génération statique (SSG), Next.js offre une flexibilité impressionnante pour la gestion des données, notamment à travers deux mécanismes majeurs : les API Routes et les Server Functions de React (server functions, server components, etc.).
+
+Quand faut-il utiliser une **API route** plutôt qu'une **Server Function** ? Comment choisir la meilleure approche en fonction de votre besoin ? Plongeons ensemble dans ces concepts essentiels pour faire les bons choix architecturaux.
+
+Je suis **Sacha Choumiloff**, ingénieur logiciel et entrepreneur. Mon objectif à travers ces articles est de partager des outils et techniques qui pourraient vous inspirer ou vous être utiles dans vos propres projets futurs.
+
+## Qu'est-ce qu'une server function ? 
+
+Une `server function` ou anciennement `server action` (depuis la [version 19](https://react.dev/versions) de React), est une fonction qui est exécutée sur le serveur et invoquée directement depuis un composant React, la plupart du temps suite à une action utilisateur. Elles utilisent un mécanisme interne basé sur **React Server Components** et **React Compiler** pour différencier le code exécuté côté client et côté serveur.
+- Les **React Server Components (RSC)** ont été introduits dans la version 18 de react et permettent d'exécuter certaines parties d'une application React entièrement côté serveur et de les injecter dans le rendu sans jamais les envoyer au client.
+- Le **React Compiler** permet de différencier le code exécuté côté client et côté serveur.
+
+### Comment déclarer une server function ? 
+
+Il existe deux approches principales pour déclarer des server functions dans Next.js :
+
+1. **Dans des fichiers dédiés** : Vous pouvez créer des fichiers séparés (par exemple `actions.ts`) qui contiennent uniquement vos server functions. Cette approche favorise une meilleure organisation du code et facilite la réutilisation des fonctions à travers votre application. Il suffit d'ajouter la directive `"use server"` en haut du fichier.
+```tsx
+"use server";
+
+export async function maServerFunction() {
+  // ... code a executer sur le serveur
+}
+```
+
+2. **Directement dans les composants** : Vous pouvez également déclarer vos server functions directement dans vos composants ou pages, en utilisant la directive `"use server"` au niveau de la fonction. Cette approche est pratique pour des fonctions spécifiques à un composant.
+
+```tsx
+export default async function MaPageForm() {
+  async function handleSubmit(formData: FormData) {
+
+    'use server'; 
+    //    ... code a executer sur le serveur
+  } 
+
+  return (
+    <form action={handleSubmit}>
+      {' '}
+      <label htmlFor="name">Nom</label>
+      <input type="text" id="name" name="name" required />
+      <label htmlFor="email">Email</label>
+      <input type="email" id="email" name="email" required />
+      <button type="submit">Créer un utilisateur</button>
+    </form>
+  );
+}
+```
+
+Les deux approches sont valides et peuvent même être utilisées simultanément dans un projet. Le choix dépendra de :
+- La réutilisabilité de vos fonctions
+- L'organisation souhaitée de votre code
+- La complexité de votre application
+
+## Qu'est-ce qu'une API route ? 
+
+Une **API route** est une fonctionnalité de Next.js qui permet de créer facilement des endpoints backend au sein même de votre application. Ces routes sont exécutées côté serveur, ce qui signifie que leur logique n'est jamais exposée au client. 
+
+### Ou sont elles définies ? 
+
+Chaque route API est définie dans un fichier qu'on nomme généralement `route.ts` ou `route.js`. Je souhaite créer une route API qui récupère l'ensemble des produits de ma base de données ? Je vais créer le fichier `app/api/produits/route.ts` et y définir ma logique de récupération.  
+
+### Comment gérer les paramètres dynamiques (slugs) ?
+
+Next.js permet de créer des **routes API dynamiques**, facilitant l'organisation des endpoints et l'accès aux données en fonction des paramètres d'URL.  
+
+- **1. Paramètre simple**  
+Une API Route peut inclure un **paramètre unique** dans son chemin, permettant de récupérer des données spécifiques en fonction d'un identifiant (`id`). Pour cela on créera le fichier `app/api/produits/[id]/route.ts` et on y définira la logique (*[id] est un répertoire dynamique*).  
+
+- **2. Paramètres multiples**  
+Les routes API peuvent contenir **plusieurs paramètres dynamiques**, structurant ainsi des endpoints hiérarchiques. Cela est utile pour organiser les données par catégories ou sous-groupes. Pour cela on créera le fichier `app/api/produits/[categorie]/[id]/route.ts` et on y définira la logique (*[categorie] et [id] sont des répertoires dynamiques*).  
+
+- **3. Capture de tous les segments (Catch-All Routes)**  
+Les routes dynamiques peuvent capturer un **nombre variable de segments d'URL** grâce aux **routes catch-all** (`[...slug]`). Cette fonctionnalité offre deux variantes :
+- Le **catch-all obligatoire** (`[...slug]`) qui nécessite au moins un segment dans l'URL
+- Le **catch-all optionnel** (`[[...slug]]`) qui fonctionne même sans segment
+
+Cette approche est particulièrement adaptée pour des structures hiérarchiques dynamiques comme des systèmes de documentation, des APIs de gestion de fichiers ou des URLs SEO avec une profondeur variable.
+
+### Comment définir une route API avec les différents verbes HTTP ?
+
+Un fichier `route.ts` peut gérer plusieurs verbes HTTP. Par Exemple, le fichier `app/api/produits/route.ts` peut gérer les verbes `GET` et `POST`. Pour cela on définit un handler pour chaque verbe.
+
+```tsx
+export async function GET(request: Request) {
+  // ... logique pour récupérer les produits
+}
+
+export async function POST(request: Request) {
+  // ... logique pour créer un produit
+}
+```
+
+L'objet `request` implémente l'interface **Request** de [l'API fetch](https://developer.mozilla.org/fr/docs/Web/API/Request) et contient des informations sur la requête HTTP, comme les headers, le corps de la requête, etc.
+
+Chaque handler retourne un objet qui implémente l'interface **Response** de [l'API fetch](https://developer.mozilla.org/fr/docs/Web/API/Response). Pour cela NextJs nous propose l'objet `NextResponse`.
+
+```tsx
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  const produits = // récupération des produits
+  return NextResponse.json({
+    data: produits.map((produit) => ({
+      id: produit.id,
+      nom: produit.nom,
+      prix: produit.prix,
+    })),
+    status: 200,
+  })
+}
+```
+
+## API route ou server function que choisir ?
+
+### 1. Server functions
+
+#### Avantages
+
+- **Facilité de mise en place** : Il suffit d'un fichier avec `"use server"` pour qu'une fonction devienne une Server Functions
+- **TypeScript natif** : Contrairement aux requêtes fetch(), les Server Functions sont automatiquement typées
+- **Optimisation côté serveur** : Pas d'appel HTTP, l'exécution est directe et plus performante
+
+#### Inconvénients
+
+- **Non accessible par d'autres services** : Une Server Functions ne peut pas être appelée depuis une application mobile ou une API externe
+- **Uniquement en POST** : Impossible d'exposer une API complète avec plusieurs méthodes (GET, PUT, DELETE)
+- **Fortement couplé à Next.js** : Pas d'accès direct à req et res comme dans une API classique
+- **Timeout limité** : L'exécution peut être interrompue si la page change ou se ferme
+
+### 2. API Routes (app/api/)
+
+#### Avantages
+
+- **Plus de liberté** : Accès complet à req et res, permettant une personnalisation avancée
+- **Accessible depuis n'importe où** : Utilisable par d'autres serveurs, applications mobiles ou services tiers
+- **Support complet HTTP** : Gestion de toutes les méthodes HTTP (GET, POST, PUT, DELETE, etc.)
+
+#### Inconvénients
+
+- **Requiert un fetch()** : Contrairement aux Server Functions, les API Routes nécessitent un appel HTTP explicite
+- **Moins intégré au code React** : Les API Routes sont souvent placées dans un dossier /api, éloigné des composants React
+
+### Comment choisir la bonne approche ?
+
+#### Utilisez une Server Functions si :
+
+- L'endpoint est utilisé uniquement par votre application Next.js
+- Vous voulez éviter les requêtes fetch() pour un code plus propre et rapide
+- Vous souhaitez optimiser les performances et éviter d'exposer une API publique
+
+#### Utilisez une API Route si :
+
+- L'API doit être accessible par une application mobile, un autre serveur ou un service externe
+- Vous avez besoin d'un temps d'exécution plus long (ex: traitement intensif, génération d'un fichier)
+- Vous voulez une API REST complète avec plusieurs méthodes HTTP
+
+## Et la sécurité dans tout ça ?
+
+### Ai-je besoin de sécuriser mes Server Functions ?
+
+💡 *"Pas de souci, mon utilisateur est authentifié côté client, donc mes Server Functions sont sécurisées, non ?"*  
+
+C'est une pensée logique… mais **pas totalement vraie !**
+
+Si une fonction s'exécute **côté serveur**, cela ne signifie pas qu'elle est **totalement protégée**. En réalité, une Server Functions peut toujours être **appelée directement**, tant qu'on connaît son point d'accès.  
+
+#### Faisons une expérience !
+
+J'ai créé une petite application de démonstration pour illustrer ce problème de sécurité. Voici comment elle fonctionne :
+
+1. Une page avec un formulaire de connexion qui demande un mot de passe
+2. Le mot de passe est "secret123" (oui, très sécurisé 😅)
+3. Une fois connecté, un bouton permet d'accéder à un "secret" via une server Functions
+4. Si on n'est pas connecté, impossible d'accéder au bouton pour récupérer le secret
+
+En apparence, tout semble sécurisé : sans le mot de passe, impossible d'accéder au secret depuis l'interface... Mais est-ce vraiment le cas ?
+
+#### Peut-on accéder à une Server Functions sans passer par l'application Next.js ?  
+
+Oui, **une Server Functions peut être déclenchée en dehors de l'application**, sans même avoir accès à son code source. En voici la démonstration :
+
+![nextjs-server-function-response](/nextjs-server-function-connect.png)
+
+Une fois connecté, on accède à cette interface et on clique sur le bouton "Récupérer mon secret".
+
+![nextjs-server-function-response](/nextjs-server-function-after-connect.png)
+
+A chaque click, sur le bouton "Récupérer mon secret", on appelle la server Functions `getSecret` déclarée dans le fichier `actions.ts`. l'inspecteur web de chrome nous permet de voir la requête envoyée à l'application.
+
+![nextjs-server-function-response](/nextjs-server-function-inspect1.png)
+
+Si on inspecte les **requests headers**, on peut voir le header `Next-Action` qui identifie notre server Functions. Cet identifiant est généré par Next.js est un hash de la fonction `getSecret`. Ce hash est unique est a été définit lors de la compilation. C'est lui qui permet d'indiquer au serveur quelle fonction exécuter. 
+
+![nextjs-server-function-response](/nextjs-server-function-next-action.png)
+
+Une fois ces informations récupérées, on peut les copier dans les headers de notre requête Postman.
+
+![nextjs-server-function-response](/nextjs-server-function-postman.png)
+
+Comme vous pouvez le voir sur cette capture d'écran de Postman, il est possible d'appeler directement la server Functions en contournant complètement l'authentification mise en place côté client ! 
+
+La requête est simple :
+1. Une requête POST vers l'URL de notre application
+2. Un header spécial `Next-Action` qui identifie notre server Functions
+3. Et voilà, nous avons accès au secret sans jamais avoir saisi le mot de passe !
+
+💡 **Conclusion** : Une authentification côté client n'est jamais suffisante. Il est crucial de sécuriser vos server Functions côté serveur, par exemple en utilisant des sessions sécurisées ou des tokens JWT.
+
+Vous pouvez vous même refaire l'expérience depuis [ce lien](https://dataelevation.dev/example/server-action-security)
+
+### Ai-je besoin de sécuriser mes API Routes ?
+
+La sécurisation des API Routes dans Next.js ne diffère pas d'une API REST classique. Les mêmes bonnes pratiques s'appliquent : authentification (JWT, sessions, API keys), validation des données entrantes, et gestion des autorisations.
+
+## Conclusion
+
+Le choix entre Server Functions et API Routes n'est pas une question de "meilleure" solution, mais plutôt de contexte et de besoins spécifiques. Les deux approches ont leur place dans l'écosystème Next.js et peuvent même être utilisées de manière complémentaire dans un même projet.
+
+### Points clés à retenir :
+- Les Server Functions sont idéales pour les interactions rapides / mutations au sein de votre application Next.js
+- Les API Routes sont préférables pour créer des endpoints accessibles depuis l'extérieur
+- La sécurité doit être une préoccupation majeure, quelle que soit l'approche choisie
+- Une bonne architecture peut combiner les deux approches selon les besoins
+
+N'oubliez pas que la sécurité doit toujours être implémentée côté serveur, peu importe la méthode choisie.
+
+Si vous souhaitez approfondir ces concepts, je vous invite à consulter [la documentation officielle de Next.js](https://nextjs.org/docs) qui est régulièrement mise à jour avec les dernières bonnes pratiques.
+
+
