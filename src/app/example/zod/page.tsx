@@ -1,8 +1,7 @@
 "use client"
 
 import { useSearchParams, useRouter } from "next/navigation"
-import { useEffect } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Suspense, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FormValidation } from "./components/form-validation"
 import { ApiValidation } from "./components/api-validation"
@@ -12,12 +11,19 @@ import Link from "next/link"
 import { DiscriminatedValidation } from "./components/discriminated-validation"
 
 export default function ZodExamplesPage() {
+  return (
+    <Suspense>
+      <ZodExamplesContent />
+    </Suspense>
+  )
+}
+
+function ZodExamplesContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const tab = searchParams.get("tab") || "form"
 
   useEffect(() => {
-    // Mettre à jour l'URL si le tab par défaut est sélectionné
     if (!searchParams.get("tab")) {
       router.replace("/example/zod?tab=form")
     }
