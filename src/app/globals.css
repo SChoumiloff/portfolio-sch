@@ -163,3 +163,16 @@ article img {
   
   border-radius: 8px; /* Ajoute des coins arrondis */
 }
+
+.command-tab {
+  display: none;
+}
+
+.command-tab[data-tab="npm"] {
+  display: block;
+}
+
+/* Ajoutez des boutons de switch dans votre UI pour basculer entre les classes actives */
+.npm-active .command-tab[data-tab="npm"] { display: block; }
+.yarn-active .command-tab[data-tab="yarn"] { display: block; }
+.pnpm-active .command-tab[data-tab="pnpm"] { display: block; }
