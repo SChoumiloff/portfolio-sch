@@ -92,7 +92,7 @@ export function TransformValidation() {
                         <p className="text-sm font-medium">1️⃣ Prix</p>
                         {activeField === 'price' && (
                           <p className="text-xs text-muted-foreground">
-                            Essayez "12,99 €" ou "15.50$"
+                            Essayez &ldquo;12,99 €&ldquo; ou &ldquo;15.50$&ldquo;
                           </p>
                         )}
                       </div>

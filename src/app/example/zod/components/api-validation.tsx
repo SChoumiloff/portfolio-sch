@@ -69,16 +69,16 @@ export function ApiValidation() {
         <div className="space-y-6">
           <Card className="h-full">
             <CardHeader className="space-y-1">
-              <CardTitle>Sécurisation des Données d'API</CardTitle>
+              <CardTitle>Sécurisation des Données d&apos;API</CardTitle>
               <CardDescription>
-                Découvrez pourquoi et comment valider les données d'API avec Zod
+                Découvrez pourquoi et comment valider les données d&apos;API avec Zod
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="max-w-md w-full space-y-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium">👋 Pourquoi valider les données d'API ?</h3>
+                    <h3 className="text-sm font-medium">👋 Pourquoi valider les données d&apos;API ?</h3>
                     <p className="text-sm text-muted-foreground">
                       Les APIs peuvent parfois renvoyer des données inattendues :
                     </p>
@@ -183,7 +183,7 @@ export function ApiValidation() {
             <CardHeader className="space-y-1">
               <CardTitle>Comment ça marche ?</CardTitle>
               <CardDescription>
-                Voici comment implémenter la validation d'API
+                Voici comment implémenter la validation d&apos;API
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

@@ -79,7 +79,7 @@ export function FormValidation() {
                       La validation côté client est essentielle pour :
                     </p>
                     <ul className="text-sm text-muted-foreground list-disc pl-4 space-y-1">
-                      <li>Améliorer l'expérience utilisateur</li>
+                      <li>Améliorer l&apos;expérience utilisateur</li>
                       <li>Réduire les erreurs de saisie</li>
                       <li>Protéger votre application</li>
                     </ul>

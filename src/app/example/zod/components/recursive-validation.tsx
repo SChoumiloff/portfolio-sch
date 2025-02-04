@@ -125,7 +125,7 @@ export function RecursiveValidation() {
                     <ul className="text-sm text-muted-foreground list-disc pl-4 space-y-1">
                       <li>Les commentaires peuvent contenir des réponses</li>
                       <li>Ces réponses peuvent elles-mêmes avoir des réponses</li>
-                      <li>La structure peut s'imbriquer à l'infini !</li>
+                      <li>La structure peut s&apos;imbriquer à l&apos;infini !</li>
                     </ul>
                   </div>
 
@@ -160,7 +160,7 @@ export function RecursiveValidation() {
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium">✅ Structure validée :</p>
                         <p className="text-xs text-muted-foreground">
-                          (Regardez comme les commentaires s'imbriquent !)
+                          (Regardez comme les commentaires s&apos;imbriquent !)
                         </p>
                       </div>
                       <Alert>

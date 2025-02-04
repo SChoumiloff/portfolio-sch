@@ -32,15 +32,15 @@ export default function ZodExamplesPage() {
       <div className="max-w-3xl  mb-10 space-y-4">
         <h1 className="text-3xl font-bold">Exemples pratiques de Zod</h1>
         <p className="text-muted-foreground">
-          Ces exemples interactifs accompagnent l'article{" "}
+          Ces exemples interactifs accompagnent l&apos;article{" "}
           <Link 
             href="/blog/next-zod" 
             target="_blank"
             className="font-medium underline underline-offset-4 hover:text-primary"
           >
-            "Zod : Validez vos données avec élégance et simplicité"
+            &ldquo;Zod : Validez vos données avec élégance et simplicité&ldquo;
           </Link>
-          . Ils vous permettent d'expérimenter en direct avec les différentes fonctionnalités de Zod présentées dans l'article.
+          . Ils vous permettent d&apos;expérimenter en direct avec les différentes fonctionnalités de Zod présentées dans l&apos;article.
         </p>
       </div>
 
@@ -51,7 +51,7 @@ export default function ZodExamplesPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="form">Validation de Formulaire</SelectItem>
-            <SelectItem value="api">Validation d'API</SelectItem>
+            <SelectItem value="api">Validation d&apos;API</SelectItem>
             <SelectItem value="recursive">Structures Récursives</SelectItem>
             <SelectItem value="transform">Transformations</SelectItem>
             <SelectItem value="discriminated">Validation Discriminée</SelectItem>

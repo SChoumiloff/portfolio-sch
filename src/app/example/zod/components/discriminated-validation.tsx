@@ -122,9 +122,9 @@ export function DiscriminatedValidation() {
                       Cliquez sur les boutons ci-dessous pour voir comment Zod valide différents types de réponses API :
                     </p>
                     <ul className="text-sm text-muted-foreground list-disc pl-4 space-y-1">
-                      <li>Le bouton "Succès" montre une réponse API valide</li>
-                      <li>Le bouton "Erreur" montre une réponse d'erreur valide</li>
-                      <li>Le bouton "Invalide" montre ce qui se passe quand les données sont incorrectes</li>
+                      <li>Le bouton &ldquo;Succès&ldquo; montre une réponse API valide</li>
+                      <li>Le bouton &ldquo;Erreur&ldquo; montre une réponse d&apos;erreur valide</li>
+                      <li>Le bouton &ldquo;Invalide&ldquo; montre ce qui se passe quand les données sont incorrectes</li>
                     </ul>
                   </div>
 
@@ -208,7 +208,7 @@ export function DiscriminatedValidation() {
 
           <Card className="h-full">
             <CardHeader className="space-y-1">
-              <CardTitle>Données d'exemple</CardTitle>
+              <CardTitle>Données d&apos;exemple</CardTitle>
               <CardDescription>
                 Différents formats de réponse API
               </CardDescription>
@@ -262,7 +262,7 @@ export function DiscriminatedValidation() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <p className="text-sm font-medium">1️⃣ D'abord, on définit notre schéma :</p>
+                <p className="text-sm font-medium">1️⃣ D&apos;abord, on définit notre schéma :</p>
                 <CodeBlock
                   title="Schéma d'union discriminée"
                   code={`const ApiResponse = z.discriminatedUnion("status", [
@@ -288,7 +288,7 @@ export function DiscriminatedValidation() {
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm font-medium">2️⃣ Ensuite, on l'utilise comme ça :</p>
+                <p className="text-sm font-medium">2️⃣ Ensuite, on l&apos;utilise comme ça :</p>
                 <CodeBlock
                   title="Validation avec gestion des cas"
                   code={`const result = ApiResponse.parse(response)
