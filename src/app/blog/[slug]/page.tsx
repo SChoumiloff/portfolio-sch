@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from 'next/link';
 import { ShareButtons } from "@/components/ShareButtons";
+import { SubArticleCard } from "@/components/sub-article-card";
 
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
@@ -70,10 +71,18 @@ export default async function Blog({
   };
 }) {
   let post = await getPost(params.slug);
-
   if (!post) {
     notFound();
   }
+
+  // Récupérer tous les articles et les trier par date
+  const allPosts = await getBlogPosts();
+  const recentPosts = allPosts
+    .sort((a, b) => 
+      new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime()
+    )
+    .filter(p => p.slug !== params.slug) // Exclure l'article courant
+    .slice(0, 4); // Prendre les 4 premiers
 
   const readingTime = calculateReadingTime(post.source);
 
@@ -133,6 +142,27 @@ export default async function Blog({
         className="prose dark:prose-invert"
         dangerouslySetInnerHTML={{ __html: post.source }}
       ></article>
+      
+      <div className="mt-12">
+        <h2 className="text-xl font-semibold mb-6">Articles récents</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {recentPosts.map((post) => {
+            if (post.slug !== params.slug) {  
+              return (
+                <SubArticleCard
+                  key={post.slug}
+                  title={post.metadata.title}
+                  description={post.metadata.summary}
+                  tags={post.metadata.keywords || []}
+                readingTime={calculateReadingTime(post.source)}
+                image={post.metadata.image || "/placeholder.svg"}
+                slug={post.slug}
+              />
+            )
+          }
+          })}
+        </div>
+      </div>
     </section>
   );
 }
