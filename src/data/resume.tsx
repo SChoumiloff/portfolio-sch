@@ -191,7 +191,8 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image: '/smart-talk-storiz.png'
+      image: '/smart-talk-storiz.png',
+      video: ''
     },
     {
       title: "Analyzeurbiz",
