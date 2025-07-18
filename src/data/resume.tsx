@@ -28,7 +28,8 @@ export const DATA = {
     "Docker",
     "Kubernetes",
     "GCP",
-    "VPS"
+    "VPS",
+    "Triton"
   ],
   keywords: [
     "Sacha Choumiloff",
@@ -65,7 +66,11 @@ export const DATA = {
     "Développeur logiciel freelance",
     "Freelance en Bourgogne",
     "Clean code freelance",
-    "Création SaaS"
+    "Création SaaS",
+    "MLops",
+    "Ingénieur IA",
+    "AI engineer",
+    ""
   ],
   navbar: [
     { href: "/", icon: HomeIcon, label: "Home" },
@@ -100,6 +105,17 @@ export const DATA = {
 
   work: [
     {
+      company: "HolbertonSchool",
+      badges: [],
+      href: "https://www.holbertonschool.fr/",
+      location: "France",
+      title: "Ingénieur logiciel et formateur",
+      logoUrl: "https://cdn.prod.website-files.com/64107f65f30b69371e3d6bfa/65c6179aa44b63fa4f31e7ad_Holberton-Logo-Cherry.svg",
+      start: "Mars 2025",
+      end: "Actuel",
+      description: "En tant que Software Engineer, je conçois des applications internes et encadre la formation des étudiants sur le campus de Dijon. Je suis également référent national IA / Deep Learning, rôle dans lequel j’accompagne les étudiants au quotidien sur leurs projets."
+    },
+    {
       company: "Analyzeurbiz",
       href: "https://analyzeurbiz.com",
       badges: [],
@@ -107,7 +123,7 @@ export const DATA = {
       title: "CEO",
       logoUrl: "/analyzeurbiz.png",
       start: "Septembre 2024",
-      end: "Actuel",
+      end: "Mars 2025",
       description:
         "Analyzeurbiz est un SaaS qui permet aux gestionnaires d'établissement d'avoir une plateforme qui aggrège l'ensemble des avis clients en fournissant des alertes et des recommandations pour améliorer leurs services.",
     },
@@ -156,9 +172,31 @@ export const DATA = {
   ],
   projects: [
     {
+      title: "Smart Talk - Storiz",
+      href: "https://www.groupe-bizness.com/lcms/",
+      dates: "Juillet 2025 - Actuel",
+      active: true,
+      description: "Smart Talks est une solution d’entraînement conversationnel de l'application Storiz, permettant aux équipes commerciales de simuler des échanges client réalistes et d’obtenir un feedback orienté compétences. Je conçois et déploie l’ensemble de la brique IA : design des prompts, modélisation des scénarios métier, orchestration des dialogues et infrastructure (LLM, analyse, évaluation).",
+      technologies: [
+        "TritonServer",
+        "Typescript",
+        "NestJS",
+        "Prompt engineering",
+        "Python"
+      ],
+      links: [
+        {
+          type: "Website",
+          href: "https://www.groupe-bizness.com/lcms/",
+          icon: <Icons.globe className="size-3" />,
+        },
+      ],
+      image: '/smart-talk-storiz.png'
+    },
+    {
       title: "Analyzeurbiz",
       href: "https://analyzeurbiz.com",
-      dates: "Septembre 2024 - Actuel",
+      dates: "Septembre 2024 - Mars 2025",
       active: true,
       description:
       "Analyzeurbiz est un SaaS qui permet aux gestionnaires d'établissement d'avoir une plateforme qui aggrège l'ensemble des avis clients en fournissant des alertes et des recommandations pour amélirorer leurs services.",
