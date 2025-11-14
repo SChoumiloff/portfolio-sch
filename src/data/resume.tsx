@@ -7,14 +7,14 @@ export const DATA = {
   url: "https://dataelevation.dev",
   location: "Dijon, France",
   description_classic:
-    "Ingénieur logiciel, entrepreneur, j'aime construire et déployer des solutions innovantes. Polyvalent, j'aime intervenir dans toutes les phases du développement de produit.",
+    "Cofondateur et Directeur Technique chez Gencior, je conçois des solutions d'IA sobres et souveraines pour l'industrie française. Polyvalent, j'interviens du développement algorithmique au déploiement opérationnel chez nos clients industriels.",
   description_automate_consult:
-    "Ingénieur logiciel et entrepreneur passionné, je conçois et déploie des solutions innovantes pour automatiser les processus métiers. Polyvalent, j’interviens à chaque étape du développement produit, aidant les PME à optimiser leurs opérations et à accroître leur chiffre d’affaires.",
+    "Cofondateur et Directeur Technique chez Gencior, je développe des solutions d'intelligence artificielle dédiées aux PME et ETI industrielles. Spécialisé dans la maintenance prédictive, l'optimisation des flux et le contrôle qualité, je conçois des algorithmes sur-mesure, déployés localement, qui transforment les données industrielles en leviers de compétitivité.",
   summary_classic:
-    "Mi-2024, j'ai quitté mon job d'ingénieur data à la forge, pour développer mon premier SaaS [Analyzeurbiz](https://analyzeurbiz.com). J'ai réalisé un [master en base de données et intelligence artificielle à l'université de Bourgogne](/#education). Je suis également disponible pour des missions freelance à courte et moyenne durée.",
+    "Cofondateur et Directeur Technique de [Gencior](https://gencior.ai), je dirige le développement de solutions d'IA industrielle sobres et souveraines. Diplômé du [master en base de données et intelligence artificielle de l'université de Bourgogne](/#education), je conçois des algorithmes ciblés pour la maintenance prédictive et l'optimisation industrielle.",
   summary_automate_consult:
-  "En 2024, j’ai quitté mon poste d’ingénieur data chez La Forge pour me consacrer à l’automatisation des processus métiers. Notamment, avec RTI Exploration, nous avons réduit certaines tâches de plusieurs semaines à moins de 40 minutes. Titulaire du master [base de données et intelligence artificielle de l'université de Bourgogne](/#education), je propose désormais des services d’accompagnement pour optimiser vos processus et améliorer votre performance opérationnelle et financière.",
-  avatarUrl: "https://cdn.analyzeurbiz.com/me.png",
+    "Cofondateur de Gencior, je développe des solutions d'intelligence artificielle pour les industriels français. Nos algorithmes sur-mesure, déployés localement, permettent aux PME et ETI de valoriser leurs données sans compromettre leur souveraineté. Titulaire du [master en base de données et intelligence artificielle de l'université de Bourgogne](/#education), j'interviens de la conception à la formation des équipes terrain.",
+  avatarUrl: "https://asset.gencior.ai/landing/sacha_choumiloff.png",
   skills: [
     "Python",
     "FastAPI",
@@ -104,6 +104,17 @@ export const DATA = {
   },
 
   work: [
+    {
+      company: "Gencior",
+      badges: [],
+      href: "https://gencior.ai",
+      location: "Bourgogne-Franche-Comté, France",
+      title: "Cofondateur & Directeur Technique",
+      logoUrl: "https://asset.gencior.ai/branding/Logo.png",
+      start: "Novembre 2025",
+      end: "Actuel",
+      description: "En tant que Directeur Technique, je dirige le développement de solutions d'intelligence artificielle sobres et souveraines pour l'industrie. Je conçois des algorithmes sur-mesure pour la maintenance prédictive, l'optimisation des flux et le contrôle qualité, déployés localement chez nos clients industriels. J'interviens de la R&D à la formation des équipes terrain."
+    },
     {
       company: "HolbertonSchool",
       badges: [],
@@ -200,7 +211,7 @@ export const DATA = {
       dates: "Septembre 2024 - Mars 2025",
       active: true,
       description:
-      "Analyzeurbiz est un SaaS qui permet aux gestionnaires d'établissement d'avoir une plateforme qui aggrège l'ensemble des avis clients en fournissant des alertes et des recommandations pour amélirorer leurs services.",
+        "Analyzeurbiz est un SaaS qui permet aux gestionnaires d'établissement d'avoir une plateforme qui aggrège l'ensemble des avis clients en fournissant des alertes et des recommandations pour amélirorer leurs services.",
       technologies: [
         "Next.js",
         "Typescript",
