@@ -1,9 +1,10 @@
 import { Resend } from 'resend';
 import { ContactFormEmail } from '@/emails/contact-form';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { email, subject, message } = await request.json();
 
