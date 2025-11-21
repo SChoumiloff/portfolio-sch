@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import * as jwt from "jsonwebtoken";
 
+export const dynamic = 'force-dynamic';
+
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "your-admin-password";
 
