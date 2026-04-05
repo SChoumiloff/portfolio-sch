@@ -39,13 +39,16 @@ export async function generateMetadata({
     title: `${title} | Blog Tech Sacha Choumiloff`,
     description,
     keywords: keywordsSEO,
+    alternates: {
+      canonical: `${DATA.url}/blog/${post.slug}`,
+    },
     openGraph: {
       title,
       description,
       type: "article",
       publishedTime,
       url: `${DATA.url}/blog/${post.slug}`,
-      images: [{ 
+      images: [{
         url: ogImage,
         width: 1200,
         height: 630,
@@ -110,19 +113,43 @@ export default async function Blog({
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "BlogPosting",
-            headline: post.metadata.title,
-            datePublished: post.metadata.publishedAt,
-            dateModified: post.metadata.publishedAt,
-            description: post.metadata.summary,
-            image: post.metadata.image
-              ? `${DATA.url}${post.metadata.image}`
-              : `${DATA.url}/og?title=${post.metadata.title}`,
-            url: `${DATA.url}/blog/${post.slug}`,
-            author: {
-              "@type": "Person",
-              name: DATA.name,
-            },
+            "@graph": [
+              {
+                "@type": "BlogPosting",
+                headline: post.metadata.title,
+                datePublished: post.metadata.publishedAt,
+                dateModified: post.metadata.publishedAt,
+                description: post.metadata.summary,
+                inLanguage: "fr-FR",
+                mainEntityOfPage: {
+                  "@type": "WebPage",
+                  "@id": `${DATA.url}/blog/${post.slug}`,
+                },
+                image: post.metadata.image
+                  ? `${DATA.url}${post.metadata.image}`
+                  : `${DATA.url}/og?title=${post.metadata.title}`,
+                url: `${DATA.url}/blog/${post.slug}`,
+                author: {
+                  "@type": "Person",
+                  name: DATA.name,
+                  url: DATA.url,
+                  image: DATA.avatarUrl,
+                },
+                publisher: {
+                  "@type": "Person",
+                  name: DATA.name,
+                  url: DATA.url,
+                },
+              },
+              {
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "Accueil", item: DATA.url },
+                  { "@type": "ListItem", position: 2, name: "Blog", item: `${DATA.url}/blog` },
+                  { "@type": "ListItem", position: 3, name: post.metadata.title },
+                ],
+              },
+            ],
           }),
         }}
       />

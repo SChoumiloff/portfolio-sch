@@ -20,7 +20,7 @@ const fontSans = Roboto({
 export const metadata: Metadata = {
   metadataBase: new URL(DATA.url),
   title: {
-    default: DATA.name,
+    default: "Sacha Choumiloff | CTO & Développeur IA - Gencior",
     template: `%s | ${DATA.name}`,
   },
   keywords: [...DATA.keywords],
@@ -32,6 +32,14 @@ export const metadata: Metadata = {
     siteName: `${DATA.name}`,
     locale: "fr_FR",
     type: "website",
+    images: [
+      {
+        url: DATA.avatarUrl,
+        width: 800,
+        height: 800,
+        alt: "Sacha Choumiloff",
+      },
+    ],
   },
   robots: {
     index: true,
@@ -47,6 +55,10 @@ export const metadata: Metadata = {
   twitter: {
     title: `${DATA.name}`,
     card: "summary_large_image",
+    images: [DATA.avatarUrl],
+  },
+  alternates: {
+    canonical: DATA.url,
   },
   verification: {
     google: "",
@@ -60,7 +72,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased mx-auto py-12 sm:py-24 px-6",

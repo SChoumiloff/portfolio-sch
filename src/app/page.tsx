@@ -287,14 +287,57 @@ const PageContent = () => {
 
 export default function Page() {
   return (
-    <Suspense 
-      fallback={
-        <div className="min-h-[100dvh] w-full flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-foreground/60" />
-        </div>
-      }
-    >
-      <PageContent />
-    </Suspense>
+    <>
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Person",
+                name: "Sacha Choumiloff",
+                jobTitle: "Cofondateur & Directeur Technique",
+                url: "https://dataelevation.dev",
+                image: "https://asset.gencior.ai/landing/sacha_choumiloff.png",
+                description:
+                  "Cofondateur et Directeur Technique chez Gencior, je conçois des solutions d'IA sobres et souveraines pour l'industrie française.",
+                sameAs: [
+                  "https://www.linkedin.com/in/sachachoumiloff/",
+                  "https://github.com/SChoumiloff",
+                ],
+                worksFor: {
+                  "@type": "Organization",
+                  name: "Gencior",
+                  url: "https://gencior.ai",
+                },
+                knowsAbout: [
+                  "Intelligence Artificielle",
+                  "Machine Learning",
+                  "Next.js",
+                  "Python",
+                  "TypeScript",
+                ],
+              },
+              {
+                "@type": "WebSite",
+                name: "Sacha Choumiloff",
+                url: "https://dataelevation.dev",
+              },
+            ],
+          }),
+        }}
+      />
+      <Suspense
+        fallback={
+          <div className="min-h-[100dvh] w-full flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-foreground/60" />
+          </div>
+        }
+      >
+        <PageContent />
+      </Suspense>
+    </>
   );
 }

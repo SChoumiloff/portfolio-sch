@@ -20,22 +20,8 @@ export default async function sitemap() {
     lastModified: new Date().toISOString(),
   }));
 
-  // Routes dynamiques basées sur vos sections de page d'accueil
-  const homeRoutes = [
-    '#about',
-    '#work',
-    '#education',
-    '#skills',
-    '#projects',
-    '#contact'
-  ].map((section) => ({
-    url: `${DATA.url}/${section}`,
-    lastModified: new Date().toISOString(),
-  }));
-
   return [
     ...routes,
-    ...homeRoutes,
     ...blogUrls,
   ];
 } 

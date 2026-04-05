@@ -1,0 +1,151 @@
+---
+title: "Java Triton SDK : un client Java pour NVIDIA Triton Inference Server"
+publishedAt: "2026-04-05"
+summary: "Pourquoi et comment j'ai développé un SDK Java open-source pour communiquer avec NVIDIA Triton Inference Server, le serveur d'inférence au coeur de l'infrastructure IA de Gencior."
+keywords: ["triton inference server", "java sdk", "grpc", "inférence IA", "machine learning serving"]
+keywordsSEO: ["triton inference server", "java triton client", "nvidia triton", "grpc java", "machine learning serving", "model serving", "inference server", "triton grpc", "java ml sdk", "triton sdk", "nvidia triton java", "model inference", "deep learning serving", "ai infrastructure", "ml deployment", "model deployment", "triton streaming", "grpc streaming", "tls grpc", "mtls java", "testcontainers triton", "integration testing ml", "java ai sdk", "inference api", "model management", "triton python backend", "gpu inference", "cpu inference", "model repository", "triton client library", "java machine learning", "serving framework", "ai serving", "ml infrastructure", "model serving java", "protobuf java", "grpc client java", "triton server api", "inference optimization", "batch inference", "streaming inference", "real-time inference", "llm serving", "triton ensemble", "model pipeline"]
+author: "Sacha Choumiloff"
+image: "https://opengraph.githubassets.com/<hash>/gencior-ai/java-triton-sdk"
+tags: ["Java", "Triton", "gRPC", "Machine Learning", "Open Source", "Gencior"]
+readingTime: "8 min"
+---
+
+# Java Triton SDK : un client Java pour Triton Inference Server
+
+Chez **Gencior**, on construit des applications d'IA pour des cas d'usage métier concrets : entraînement conversationnel, analyse de documents, génération de contenu. Toutes ces applications ont un point commun : elles doivent appeler des modèles de machine learning en production, de manière fiable et performante. Pour ça, on s'appuie sur **NVIDIA Triton Inference Server** comme serveur d'inférence principal.
+
+Le problème ? Il n'existait pas de client Java mature pour communiquer avec Triton. J'ai donc décidé d'en créer un.
+
+---
+
+## Qu'est-ce que Triton Inference Server ?
+
+**Triton Inference Server** est un serveur d'inférence open-source développé par NVIDIA. Son rôle est simple : servir des modèles de machine learning en production via une API standardisée (gRPC ou HTTP).
+
+Ce qui le rend puissant :
+
+- **Multi-framework** : il peut servir des modèles TensorFlow, PyTorch, ONNX, TensorRT, ou même du Python custom via le Python Backend
+- **Multi-GPU / CPU** : il gère nativement le placement des modèles sur GPU ou CPU
+- **Batching dynamique** : il regroupe automatiquement les requêtes pour maximiser le throughput GPU
+- **Streaming** : il supporte l'inférence en streaming via gRPC, indispensable pour les cas d'usage type LLM (génération token par token)
+- **Model management** : chargement/déchargement de modèles à chaud, versioning, health checks
+- **Ensembles & pipelines** : chaînage de modèles dans un pipeline d'inférence unique
+
+Chez Gencior, Triton est le point central de notre infrastructure IA. Tous nos modèles, qu'il s'agisse de modèles de NLP, de classification ou de génération, sont servis à travers Triton. Cela nous donne une interface unifiée, un monitoring centralisé et une scalabilité native.
+
+---
+
+## Pourquoi un SDK Java ?
+
+NVIDIA fournit des clients officiels en **Python** et **C++**, mais rien en Java. Or, une partie de notre stack backend chez Gencior est en Java. On avait deux options :
+
+1. Passer par un service intermédiaire Python pour proxifier les appels (latence supplémentaire, un service de plus à maintenir)
+2. Créer un client Java natif qui parle directement gRPC à Triton
+
+On a choisi la deuxième option. Le résultat, c'est le **[Java Triton SDK](https://github.com/gencior-ai/java-triton-sdk)**, un client open-source qui couvre l'ensemble de l'API gRPC de Triton.
+
+---
+
+## Ce que fait le SDK
+
+### Inférence classique
+
+Le cas d'usage de base : envoyer des tenseurs d'entrée à un modèle et récupérer les résultats. Le SDK gère la sérialisation des données (int, float, string, boolean) et la construction des requêtes protobuf de manière transparente.
+
+```java
+TritonClient client = TritonGrpcClient.builder()
+    .host("localhost")
+    .port(8001)
+    .build();
+
+InferInput input = new InferInput("input", new long[]{1, 3}, DataType.FP32);
+input.setData(new float[]{1.0f, 2.0f, 3.0f});
+
+InferResult result = client.infer("my_model", List.of(input));
+float[] output = result.getOutput("output").asFloatArray();
+```
+
+### Streaming
+
+Pour les modèles type LLM qui génèrent des tokens un par un, le SDK expose une API de streaming via `InferStreamListener`. On ouvre un stream, on envoie une requête, et on reçoit les résultats au fil de l'eau :
+
+```java
+InferStreamHandle stream = client.inferStream(new InferStreamListener() {
+    @Override
+    public void onResponse(InferResult result) {
+        System.out.print(result.getOutput("output").asStringArray()[0]);
+    }
+
+    @Override
+    public void onError(Throwable t) {
+        System.err.println("Erreur : " + t.getMessage());
+    }
+
+    @Override
+    public void onComplete() {
+        System.out.println("\n[Stream terminé]");
+    }
+});
+
+stream.infer("streaming_model", List.of(input));
+```
+
+### TLS & mTLS
+
+En production, les communications doivent être chiffrées. Le SDK supporte le TLS one-way (vérification du serveur) et le mutual TLS (authentification bidirectionnelle) :
+
+```java
+TritonClient client = TritonGrpcClient.builder()
+    .host("triton.internal")
+    .port(8001)
+    .tlsEnabled(true)
+    .caCertPath("/certs/ca.pem")
+    .clientKeyPath("/certs/client.key")
+    .clientCertPath("/certs/client.pem")
+    .build();
+```
+
+### Gestion des modèles
+
+Au-delà de l'inférence, le SDK expose les endpoints de management de Triton : lister les modèles disponibles, vérifier leur état, obtenir les métadonnées du serveur, charger/décharger des modèles dynamiquement.
+
+### Une architecture pensée pour l'extensibilité
+
+Actuellement, seule l'**API gRPC** est implémentée. Mais l'architecture du SDK a été conçue dès le départ pour rendre l'ajout d'une **API REST trivial**.
+
+Le premier refactoring a consisté à **supprimer la fuite de types protobuf** dans l'API publique. Les premières versions exposaient directement `GrpcService.InferParameter` dans les signatures de méthodes, couplant les consommateurs aux internals gRPC.
+
+On a introduit une couche d'abstraction (`InferParameters`, `InferRequestedOutput`, `InferStreamListener`) dans un package `core`, complètement indépendant du protocole de transport. Concrètement, pour ajouter un transport HTTP/REST, il suffirait de :
+
+1. Créer une implémentation de l'interface de transport existante (à l'image de `GrpcInferenceService`)
+2. Mapper les objets du `core` vers les payloads JSON de l'API REST de Triton
+3. Brancher le tout — **aucun changement côté consommateur**
+
+Cette séparation nette entre la logique métier et le protocole de communication garantit que le SDK peut évoluer sans casser l'API existante.
+
+### Tests d'intégration avec Testcontainers
+
+Pour valider que le SDK fonctionne réellement contre un vrai serveur Triton, on a mis en place une suite de **tests d'intégration avec Testcontainers**. Un conteneur Triton démarre automatiquement avec des modèles Python Backend CPU (identity, adder, sleeper, streaming echo), et les tests exercent l'ensemble des fonctionnalités : inférence, streaming, TLS/mTLS, gestion de modèles.
+
+C'est un filet de sécurité indispensable : les tests unitaires avec des mocks ne peuvent pas attraper les bugs de sérialisation ou les incompatibilités protobuf.
+
+---
+
+## Triton dans l'écosystème Gencior
+
+Triton n'est pas juste un choix technique isolé, c'est une **brique fondamentale** de l'infrastructure IA de Gencior. Voici pourquoi on l'a adopté :
+
+- **Interface unifiée** : tous les modèles, quel que soit leur framework d'origine, sont exposés via la même API. Nos services backend n'ont pas besoin de savoir si le modèle est en PyTorch, ONNX ou Python pur
+- **Scalabilité** : Triton gère nativement le multi-instance, le batching dynamique et le placement GPU. On scale les modèles indépendamment en fonction de la charge
+- **Observabilité** : Triton expose des métriques Prometheus out-of-the-box (latence, throughput, queue size), qu'on intègre directement dans notre stack de monitoring
+- **Streaming pour les LLM** : avec le support du decoupled mode, Triton est capable de servir des modèles génératifs en streaming, ce qui est essentiel pour nos applications conversationnelles
+
+Le Java Triton SDK est la pièce qui manquait pour connecter nos services Java directement à cette infrastructure, sans passer par des proxies intermédiaires.
+
+---
+
+## Conclusion
+
+Créer un SDK, c'est un exercice différent du développement applicatif classique. On réfléchit davantage à l'API publique, à la rétrocompatibilité, aux edge cases de sérialisation, et surtout à la confiance que les consommateurs vont placer dans la bibliothèque. Les tests d'intégration contre un vrai serveur Triton ont été indispensables pour atteindre ce niveau de confiance.
+
+Le projet est **open-source** et disponible sur **[GitHub](https://github.com/gencior-ai/java-triton-sdk)**. Si vous utilisez Triton dans un environnement Java, n'hésitez pas à y jeter un oeil ou à contribuer.

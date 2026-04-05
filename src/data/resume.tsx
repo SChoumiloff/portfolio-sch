@@ -113,7 +113,7 @@ export const DATA = {
       logoUrl: "https://asset.gencior.ai/branding/Logo.png",
       start: "Novembre 2025",
       end: "Actuel",
-      description: "En tant que Directeur Technique, je dirige le développement de solutions d'intelligence artificielle sobres et souveraines pour l'industrie. Je conçois des algorithmes sur-mesure pour la maintenance prédictive, l'optimisation des flux et le contrôle qualité, déployés localement chez nos clients industriels. J'interviens de la R&D à la formation des équipes terrain."
+      description: "Co-fondateur et CTO de Gencior, je porte la stratégie technique d'une entreprise d'ingénierie IA au service de l'industrie. Je structure les choix d'architecture, pilote la R&D et garantis que nos solutions restent sobres, souveraines et réellement adoptées par les équipes de nos clients."
     },
     {
       company: "HolbertonSchool",
@@ -123,7 +123,7 @@ export const DATA = {
       title: "Ingénieur logiciel et formateur",
       logoUrl: "https://cdn.prod.website-files.com/64107f65f30b69371e3d6bfa/65c6179aa44b63fa4f31e7ad_Holberton-Logo-Cherry.svg",
       start: "Mars 2025",
-      end: "Actuel",
+      end: "March 2026",
       description: "En tant que Software Engineer, je conçois des applications internes et encadre la formation des étudiants sur le campus de Dijon. Je suis également référent national IA / Deep Learning, rôle dans lequel j’accompagne les étudiants au quotidien sur leurs projets."
     },
     {
@@ -134,7 +134,7 @@ export const DATA = {
       title: "CEO",
       logoUrl: "/analyzeurbiz.png",
       start: "Septembre 2024",
-      end: "Mars 2025",
+      end: "Actuel",
       description:
         "Analyzeurbiz est un SaaS qui permet aux gestionnaires d'établissement d'avoir une plateforme qui aggrège l'ensemble des avis clients en fournissant des alertes et des recommandations pour améliorer leurs services.",
     },
@@ -182,6 +182,31 @@ export const DATA = {
     }
   ],
   projects: [
+    {
+      title: "Java Triton SDK",
+      href: "https://github.com/gencior-ai/java-triton-sdk",
+      dates: "Mars 2026 - Actuel",
+      active: true,
+      description: "SDK Java open-source pour NVIDIA Triton Inference Server. J'ai conçu et développé un client gRPC complet permettant l'inférence synchrone, asynchrone et en streaming, le support TLS/mTLS, la gestion des modèles et une API agnostique du protocole. Le projet inclut une infrastructure de tests d'intégration avec Testcontainers et un serveur Triton réel.",
+      technologies: [
+        "Java",
+        "gRPC",
+        "Protobuf",
+        "Triton Inference Server",
+        "Testcontainers",
+        "SLF4J",
+        "GitHub Actions"
+      ],
+      links: [
+        {
+          type: "Source",
+          href: "https://github.com/gencior-ai/java-triton-sdk",
+          icon: <Icons.globe className="size-3" />,
+        }
+      ],
+      image: "https://opengraph.githubassets.com/<hash>/gencior-ai/java-triton-sdk",
+      video: ""
+    },
     {
       title: "Smart Talk - Storiz",
       href: "https://www.groupe-bizness.com/lcms/",

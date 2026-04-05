@@ -5,10 +5,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { calculateReadingTime } from "@/lib/utils";
 
+import { DATA } from "@/data/resume";
+
 export const metadata = {
   title: "Blog Tech & SaaS | Sacha Choumiloff",
   description: "Articles techniques sur le développement SaaS, retours d'expérience et bonnes pratiques de développement front et back moderne.",
   keywords: ["blog tech", "développement SaaS", "stack technique", "retour d'expérience"],
+  alternates: {
+    canonical: `${DATA.url}/blog`,
+  },
+  openGraph: {
+    title: "Blog Tech & SaaS | Sacha Choumiloff",
+    description: "Articles techniques sur le développement SaaS, retours d'expérience et bonnes pratiques de développement front et back moderne.",
+    url: `${DATA.url}/blog`,
+    type: "website",
+  },
 };
 
 const BLUR_FADE_DELAY = 0.04;
@@ -16,21 +27,37 @@ const BLUR_FADE_DELAY = 0.04;
 export default async function BlogPage() {
   const posts = await getBlogPosts();
 
+  const sortedPosts = posts.sort((a, b) =>
+    new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime()
+  );
+
   return (
     <section className="max-w-2xl mx-auto px-6">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: "Blog Tech & SaaS | Sacha Choumiloff",
+            url: `${DATA.url}/blog`,
+            mainEntity: {
+              "@type": "ItemList",
+              itemListElement: sortedPosts.map((post, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                name: post.metadata.title,
+                url: `${DATA.url}/blog/${post.slug}`,
+              })),
+            },
+          }),
+        }}
+      />
       <BlurFade delay={BLUR_FADE_DELAY}>
         <h1 className="font-medium text-2xl mb-8 tracking-tighter">Carnet de Bord</h1>
       </BlurFade>
-      {posts
-        .sort((a, b) => {
-          if (
-            new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)
-          ) {
-            return -1;
-          }
-          return 1;
-        })
-        .map((post, id) => (
+      {sortedPosts.map((post, id) => (
           <BlurFade delay={BLUR_FADE_DELAY * 2 + id * 0.05} key={post.slug}>
             <Link
               className="flex flex-col space-y-1 mb-4 p-2 rounded-lg transition-all duration-200 hover:bg-primary-foreground hover:scale-[1.02]"
