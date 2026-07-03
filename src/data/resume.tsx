@@ -208,6 +208,31 @@ export const DATA = {
       video: ""
     },
     {
+      title: "BatiSearch",
+      href: "https://batisearch.com",
+      dates: "2025 - Actuel",
+      active: true,
+      description: "BatiSearch est une plateforme de gestion des connaissances dédiée aux professionnels du bâtiment, permettant de centraliser et de rendre recherchable l'ensemble des données métier (emails, documents, plans 3D IFC, PDF, XLSX, DWG...). Je conçois l'architecture backend et les briques d'intelligence artificielle assurant l'indexation et la recherche sémantique des documents techniques, avec intégration en temps réel de sources hétérogènes (ERP, plateformes cloud, outils terrain) et un déploiement souverain sur cloud européen.",
+      technologies: [
+        "Java",
+        "Spring Boot",
+        "Triton Inference Server",
+        "Neo4j",
+        "PostgreSQL",
+        "BIM",
+        "IFC"
+      ],
+      links: [
+        {
+          type: "Website",
+          href: "https://batisearch.com",
+          icon: <Icons.globe className="size-3" />,
+        },
+      ],
+      image: "https://batisearch.com/assets/BatiSearch-search-preview-new-B_iAXoBL.png",
+      video: ""
+    },
+    {
       title: "Smart Talk - Storiz",
       href: "https://www.groupe-bizness.com/lcms/",
       dates: "Juillet 2025 - Actuel",
