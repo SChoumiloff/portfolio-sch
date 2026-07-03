@@ -14,7 +14,7 @@ export const DATA = {
     "Cofondateur et Directeur Technique de [Gencior](https://gencior.ai), je dirige le développement de solutions d'IA industrielle sobres et souveraines. Diplômé du [master en base de données et intelligence artificielle de l'université de Bourgogne](/#education), je conçois des algorithmes ciblés pour la maintenance prédictive et l'optimisation industrielle.",
   summary_automate_consult:
     "Cofondateur de Gencior, je développe des solutions d'intelligence artificielle pour les industriels français. Nos algorithmes sur-mesure, déployés localement, permettent aux PME et ETI de valoriser leurs données sans compromettre leur souveraineté. Titulaire du [master en base de données et intelligence artificielle de l'université de Bourgogne](/#education), j'interviens de la conception à la formation des équipes terrain.",
-  avatarUrl: "https://asset.gencior.ai/landing/sacha_choumiloff.png",
+  avatarUrl: "https://gencior.ai/Sacha.png",
   skills: [
     "Python",
     "FastAPI",
